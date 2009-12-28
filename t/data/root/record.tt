@@ -1,0 +1,16 @@
+<html>
+<body>
+<table>
+[% FOR col = record.result_source.columns %]
+<tr>
+<td>
+<strong>[% col %]:</strong>
+</td>
+<td>
+[% record.$col %]
+</td>
+</tr>
+[% END %]
+</body>
+</html>
+
