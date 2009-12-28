@@ -52,8 +52,36 @@ This document describes WebNano version 0.001
   
 =head1 DESCRIPTION
 
-This is the minimalistic web framework - the main design goal of it is to delegate as much
-as possible to specialized CPAN modules with minimal hassle.
+This is a minimalistic web framework - the main design goal of it is to delegate as much
+as possible to specialized CPAN modules with minimal hassle. 
+
+It currently uses: PSGI/Plack tools to ease deployment and testing and Bread::Board
+to build all the application components.  What is left is just dispatching (routing) - this
+is built around the following design ideas:
+
+=head2 Controllers (like Catalyst) with methods per sub-address 
+
+=head2 Dispatching (routing) in controllers
+
+This makes controllers more independent from the whole application and 
+mixable with more flexibility.
+This also leads to the elegant design of recursive dispatching -
+you start from the root controller it then serves the request or
+chooses another controller where the same thing happens
+(sometimes called tree of resposibility - extension of the chain of responsibility 
+design pattern).
+
+=head2 Controller object live in the request scope (new controller per request)
+
+If you need to build a heavy
+structure used in the controller you can always build it as the
+application attribute and use it in the controller as it has access to
+the application object, but since all the work of controllers is done
+in the request scope (i.e. creating the request) - then it makes sense
+that the whole object lives in that scope.  This is the same as
+Tatsumaki handlers (and controllers in Rails, Django and probably
+other frameworks) - but different from Catalyst.
+
 
 =head1 ATTRIBUTES and METHODS
 
@@ -139,12 +167,12 @@ L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
-Zbigniew Łukasiak  C<< <zby@cpan.org> >>
+Zbigniew Lukasiak  C<< <zby@cpan.org> >>
 
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2009, Zbigniew Łukasiak C<< <zby@cpan.org> >>. All rights reserved.
+Copyright (c) 2009, Zbigniew Lukasiak C<< <zby@cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
