@@ -49,17 +49,19 @@ This document describes WebNano version 0.001
 
     extend WebNano;
 
-  
+See the example in t/lib/MyApp
+
 =head1 DESCRIPTION
 
 This is a minimalistic web framework - the main design goal of it is to delegate as much
 as possible to specialized CPAN modules with minimal hassle. 
 
 It currently uses: PSGI/Plack tools to ease deployment and testing and Bread::Board
-to build all the application components.  What is left is just dispatching (routing) - this
+to build the application components.  What is left is just dispatching (routing) - this
 is built around the following design ideas:
 
 =head2 Controllers (like Catalyst) with methods per sub-address 
+
 
 =head2 Dispatching (routing) in controllers
 
