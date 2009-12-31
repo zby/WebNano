@@ -32,6 +32,7 @@ sub controller_for {
 sub handle {
     my ( $self, @args ) = @_;
     my $path_part = shift @args;
+    $path_part =~ s/::|'//g;
     $path_part = 'index' if !defined( $path_part ) || !length( $path_part );
     if ( my $action = $self->can( "serve_$path_part" ) ){
         return &$action( $self, @args );
