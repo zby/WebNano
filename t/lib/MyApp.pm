@@ -38,26 +38,9 @@ sub get_handler {
             },
             dependencies => [ depends_on('config') ],
         );
-        service router => (
-            block => sub {
-                my $router = Path::Router->new;
-                $router->add_route('dvd/:action/?:id' => (
-                        defaults => {
-                            controller => 'Dvd',
-                        },
-                        validations => {
-                            action  => qr/\D+/,
-                            id      => 'Int',  # also use plain Moose types too
-                        }
-                    )
-                );
-                return $router;
-            },
-            dependencies => [ depends_on('config') ],
-        );
         service application => (
             class  => 'MyApp',
-            dependencies => [ depends_on('router'), depends_on('renderer'), depends_on('schema') ],
+            dependencies => [ depends_on('renderer'), depends_on('schema') ],
             lifecycle    => 'Singleton',
         );
     }; 

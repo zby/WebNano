@@ -13,7 +13,7 @@ requires 'Plack::Test';
 requires 'Config::Any';
 requires 'Bread::Board';
 requires 'DBIx::Class';
-requires 'Path::Router';
+#requires 'Path::Router';
 requires 'Config::General';
 requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
