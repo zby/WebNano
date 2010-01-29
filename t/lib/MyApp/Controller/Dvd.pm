@@ -1,68 +1,23 @@
 package MyApp::Controller::Dvd;
 use Moose;
+use MooseX::MethodAttributes;
+
 extends 'WebNano::Controller';
 
-has valid_actions => ( is => 'ro', default => sub { qr/delete|edit|view/ } );
-
-sub serve_index {
+sub index : Action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
     return $self->render( 'list.tt', { items => [ $rs->search ] } );
 }
 
-sub serve_record {
-    my( $self, $id, $action ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
-    my $record = $rs->find( $id );
-    if( ! $record ) {
-        my $res = $self->request->new_response(404);
-        $res->content_type('text/plain');
-        $res->body( 'No record with id: ' . $id );
-        return $res;
-    }
-    $action ||= 'view';
-    if( $action =~ $self->valid_actions ){
-        return $self->$action( $record );
-    }
+sub is_record_action {
+    my ( $self, $name ) = @_;
+    my $meta = $self->meta->get_method($name);
+    my $is_action = $meta && grep { $_ eq 'RecordAction' } @{ $meta->attributes };
+    return $is_action;
 }
 
-sub view {
-    my ( $self, $record ) = @_;
-
-    return $self->render( 'record.tt', { record => $record } );
-}
-
-sub delete {
-    my ( $self, $record ) = @_;
-    if( $self->request->method eq 'GET' ){
-        return $self->render( 'delete.tt', { record => $record } );
-    }
-    else{
-        $record->delete;
-        my $res = $self->request->new_response();
-        $res->redirect( $self->self_url );
-        return $res;
-    }
-}
-
-sub edit {
-    my ( $self, $record ) = @_;
-    my $req = $self->request;
-
-    my $form = DvdForm->new( 
-        item   => $record,
-        params => $req->params, 
-    );
-    if( $req->method eq 'POST' && $form->process() ){
-        my $res = $req->new_response();
-        $res->redirect( $self->self_url . 'record/' . $record->id . '/view' );
-        return $res;
-    }
-    $form->field( 'submit' )->value( 'Update' );
-    return $self->render( 'edit.tt', { form => $form->render } );
-}
-
-sub serve_create {
+sub create : Action {
     my ( $self ) = @_;
     my $req = $self->request;
 
@@ -78,6 +33,77 @@ sub serve_create {
     }
     $form->field( 'submit' )->value( 'Create' );
     return $self->render( 'edit.tt', { form => $form->render } );
+}
+
+sub record : Action {
+    my( $self, $id, $action ) = @_;
+    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $record = $rs->find( $id );
+    if( ! $record ) {
+        my $res = $self->request->new_response(404);
+        $res->content_type('text/plain');
+        $res->body( 'No record with id: ' . $id );
+        return $res;
+    }
+    my $new_controller = MyApp::Controller::Dvd::Record->new(
+        application => $self->application,
+        request => $self->request,
+        self_url => $self->self_url . "record/$id/",
+        record => $record,
+    );
+    return $new_controller->handle( $action );
+}
+
+{
+    package MyApp::Controller::Dvd::Record;
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'WebNano::Controller';
+
+    has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
+
+    sub index : Action {
+        my ( $self ) = @_;
+
+        return $self->view( );
+    }
+
+    sub view : Action {
+        my ( $self ) = @_;
+
+        return $self->render( 'record.tt', { record => $self->record } );
+    }
+
+    sub delete : Action {
+        my ( $self ) = @_;
+        my $record = $self->record;
+        if( $self->request->method eq 'GET' ){
+            return $self->render( 'delete.tt', { record => $record } );
+        }
+        else{
+            $record->delete;
+            my $res = $self->request->new_response();
+            $res->redirect( $self->self_url );
+            return $res;
+        }
+    }
+
+    sub edit : Action {
+        my $self = shift;
+        my $req = $self->request;
+        my $form = DvdForm->new( 
+            item   => $self->record,
+            params => $req->params, 
+        );
+        if( $req->method eq 'POST' && $form->process() ){
+            my $res = $req->new_response();
+            $res->redirect( $self->self_url . '/view' );
+            return $res;
+        }
+        $form->field( 'submit' )->value( 'Update' );
+        return $self->render( 'edit.tt', { form => $form->render } );
+    }
 }
 
 {

@@ -29,13 +29,20 @@ sub controller_for {
     );
 }
 
+sub is_action {
+    my ( $self, $name ) = @_;
+    my $meta = $self->meta->get_method($name);
+    my $is_action = $meta && grep { $_ eq 'Action' } @{ $meta->attributes };
+    return $is_action;
+}
+
 sub handle {
     my ( $self, @args ) = @_;
     my $path_part = shift @args;
-    $path_part =~ s/::|'//g;
+    $path_part =~ s/::|'//g if defined( $path_part );
     $path_part = 'index' if !defined( $path_part ) || !length( $path_part );
-    if ( my $action = $self->can( "serve_$path_part" ) ){
-        return &$action( $self, @args );
+    if ( $self->is_action( $path_part ) ){
+        return $self->$path_part( @args );
     }
     elsif( my $new_controller = $self->controller_for( $path_part ) ){
         return $new_controller->handle( @args );
@@ -79,6 +86,10 @@ Finds a next controller to forward to according to the first path part.
 =head2 render
 
 Renders a template.
+
+=head2 is_action
+
+Checks if a method is callable from the web.
 
 =head1 ATTRIBUTES
 
