@@ -19,7 +19,11 @@ test_psgi(
         ok( $res->is_redirect, 'Redirect after POST' );
         $res = $cb->(GET $res->header('Location'));
         like( $res->content, qr/Not Jurassic Park/ );
-    } 
+        $res = $cb->(POST '/dvd_/5/edit', [ name => 'Not even trace of Jurrasic Park' ] );
+        ok( $res->is_redirect, 'Redirect after POST' );
+        $res = $cb->(GET $res->header('Location'));
+        like( $res->content, qr/Not even trace of Jurrasic Park/ );
+     } 
 );
 
 done_testing();

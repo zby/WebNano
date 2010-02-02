@@ -4,7 +4,6 @@ extends 'WebNano';
 use Bread::Board;
 use Config::Any;
 use Template;
-use Path::Router;
 use MyApp::DBSchema;
 
 has schema => ( is => 'ro' );
