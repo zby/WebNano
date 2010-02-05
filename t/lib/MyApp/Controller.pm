@@ -1,7 +1,9 @@
 package MyApp::Controller;
-use Moose;
-use MooseX::MethodAttributes;
-extends 'WebNano::Controller';
+
+BEGIN{
+    use Moose;
+    extends 'WebNano::Controller';
+}
 
 sub index : Action {
     my $self = shift;

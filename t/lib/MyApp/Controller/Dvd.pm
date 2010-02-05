@@ -1,8 +1,9 @@
 package MyApp::Controller::Dvd_;
-use Moose;
-use MooseX::MethodAttributes;
 
-extends 'WebNano::Controller';
+BEGIN{
+    use Moose; 
+    extends 'WebNano::Controller';
+}
 
 around 'handle' => sub {
     my( $orig, $self, @args ) = @_;

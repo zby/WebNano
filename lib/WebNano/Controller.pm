@@ -1,5 +1,6 @@
 package WebNano::Controller;
 use Moose;
+use MooseX::MethodAttributes;
 use Class::MOP;
 
 has application => ( is => 'ro' );
@@ -31,7 +32,7 @@ sub controller_for {
 
 sub is_action {
     my ( $self, $name ) = @_;
-    my $meta = $self->meta->get_method($name);
+    my $meta = $self->meta->find_method_by_name($name);
     my $is_action = $meta && grep { $_ eq 'Action' } @{ $meta->attributes };
     return $is_action;
 }
