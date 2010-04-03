@@ -8,34 +8,16 @@ use MyApp::DBSchema;
 
 has schema => ( is => 'ro' );
 
-sub get_handler {
-    my $c = container 'MyApp' => as { 
-        service config_name => 't/data/app';
-        service config => (
-            block => sub { 
-                my $name = shift->param('config_name');
-                my $cfg = Config::Any->load_stems({ stems => [ $name ], use_ext => 1 }); 
-                my @values = values %{$cfg->[0]};
-                return $values[0];
-            },
-            dependencies => [ depends_on('config_name') ],
-            lifecycle    => 'Singleton',
-        );
+sub bb {
+    container 'MyApp' => as { 
         service renderer => (
-            block => sub {
-                my $config = shift->param('config')->{renderer};
-                my %config;
-                %config = %$config if ref $config;
-                return Template->new( %config )
-            },
-            dependencies => [ depends_on('config') ],
+            class => 'Template',
         );
         service schema => (
             block => sub {
-                my $config = shift->param('config')->{schema};
+                my $config = shift->params;
                 return MyApp::DBSchema->connect( $config->{dbi_dsn}, $config->{user}, $config->{pass}, $config->{dbi_params} )
             },
-            dependencies => [ depends_on('config') ],
         );
         service application => (
             class  => 'MyApp',
@@ -43,7 +25,36 @@ sub get_handler {
             lifecycle    => 'Singleton',
         );
     }; 
-    $c->fetch('application')->get->handler();
+}
+
+sub get_handler {
+    my( $self, $conf_file ) = @_;
+    my $bb = $self->bb;
+    my $config = $self->get_config( $conf_file || 't/data/app' );
+    for my $key ( keys %$config ){
+        my $service = $bb->fetch( $key );
+        $service->dependencies( $self->mk_deps( $config->{$key} ) );
+    }
+    $bb->fetch('application')->get->handler();
+}
+
+sub mk_deps {
+    my( $self, $params ) = @_;
+    return if !defined $params;
+    my %hash;
+    for my $key ( keys %$params ){
+        $hash{$key} = Bread::Board::Literal->new( name => 'aaa', value => $params->{$key} );
+    }
+    return \%hash;
+}
+
+
+sub get_config {
+    my( $self, $conf_file ) = @_; 
+    
+    my $cfg = Config::Any->load_stems({ stems => [ $conf_file ], use_ext => 1 }); 
+    my @values = values %{$cfg->[0]};
+    return $values[0];
 }
 
 no Bread::Board; # removes keywords

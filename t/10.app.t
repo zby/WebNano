@@ -5,7 +5,7 @@ use lib 't/lib';
 use MyApp;
 use File::Copy;
 
-copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die 'Copy failed: $!';
+copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
 
 test_psgi( 
     app => MyApp->get_handler, 
