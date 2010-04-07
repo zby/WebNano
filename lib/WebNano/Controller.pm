@@ -1,6 +1,5 @@
 package WebNano::Controller;
 use Moose;
-use MooseX::MethodAttributes;
 use Class::MOP;
 
 has application => ( is => 'ro' );
@@ -30,7 +29,7 @@ sub controller_for {
     );
 }
 
-sub find_action {
+sub find_action_ {
     my ( $self, $name ) = @_;
     my $method = $name . '_action';
     return $method if $self->can( $method );
@@ -42,7 +41,7 @@ sub handle {
     my $path_part = shift @args;
     $path_part =~ s/::|'//g if defined( $path_part );
     $path_part = 'index' if !defined( $path_part ) || !length( $path_part );
-    if ( my $action = $self->find_action( $path_part ) ){
+    if ( my $action = $self->find_action_( $path_part ) ){
         return $self->$action( @args );
     }
     elsif( my $new_controller = eval{ $self->controller_for( $path_part ) } ){
