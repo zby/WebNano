@@ -45,13 +45,14 @@ sub handle {
     if ( my $action = $self->find_action( $path_part ) ){
         return $self->$action( @args );
     }
-    elsif( my $new_controller = $self->controller_for( $path_part ) ){
+    elsif( my $new_controller = eval{ $self->controller_for( $path_part ) } ){
         return $new_controller->handle( @args );
     }
     else{
         my $res = $self->request->new_response(404);
         $res->content_type('text/plain');
-        return $res->body( 'No such page' );
+        $res->body( 'No such page' );
+        return $res;
     }
 };
 

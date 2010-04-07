@@ -23,6 +23,8 @@ test_psgi(
         ok( $res->is_redirect, 'Redirect after POST' );
         $res = $cb->(GET $res->header('Location'));
         like( $res->content, qr/Not even trace of Jurrasic Park/ );
+        $res = $cb->(GET "/there_is_no_such_page");
+        is( $res->code, 404 , '404 for non existing controller' );
      } 
 );
 

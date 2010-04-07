@@ -1,11 +1,9 @@
 package MyApp::Controller;
 
-BEGIN{
-    use Moose;
-    extends 'WebNano::ControllerCA';
-}
+use Moose;
+extends 'WebNano::Controller';
 
-sub index : Action {
+sub index_action {
     my $self = shift;
     return $self->render( 'index.tt' );
 }
