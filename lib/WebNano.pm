@@ -1,7 +1,7 @@
 package WebNano;
 
 our $VERSION = '0.001';
-use Moose;
+use Any::Moose;
 use Plack::Request;
 use Scalar::Util qw(blessed);
 use Class::MOP;
