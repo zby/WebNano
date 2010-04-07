@@ -1,53 +1,33 @@
 package MyApp;
 use Moose;
 extends 'WebNano';
-use Bread::Board;
 use Config::Any;
 use Template;
 use MyApp::DBSchema;
 
-has schema => ( is => 'ro' );
+has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
-sub bb {
-    container 'MyApp' => as { 
-        service renderer => (
-            class => 'Template',
-        );
-        service schema => (
-            block => sub {
-                my $config = shift->params;
-                return MyApp::DBSchema->connect( $config->{dbi_dsn}, $config->{user}, $config->{pass}, $config->{dbi_params} )
-            },
-        );
-        service application => (
-            class  => 'MyApp',
-            dependencies => [ depends_on('renderer'), depends_on('schema') ],
-            lifecycle    => 'Singleton',
-        );
-    }; 
+sub _build_config {
+    my( $self ) = @_;
+    return $self->get_config( 't/data/app' );
 }
 
-sub get_handler {
-    my( $self, $conf_file ) = @_;
-    my $bb = $self->bb;
-    my $config = $self->get_config( $conf_file || 't/data/app' );
-    for my $key ( keys %$config ){
-        my $service = $bb->fetch( $key );
-        $service->dependencies( $self->mk_deps( $config->{$key} ) );
-    }
-    $bb->fetch('application')->get->handler();
+has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
+
+sub _build_schema {
+    my $self = shift;
+    my $config = $self->config->{schema};
+    return MyApp::DBSchema->connect( $config->{dbi_dsn}, $config->{user}, $config->{pass}, $config->{dbi_params} );
 }
 
-sub mk_deps {
-    my( $self, $params ) = @_;
-    return if !defined $params;
-    my %hash;
-    for my $key ( keys %$params ){
-        $hash{$key} = Bread::Board::Literal->new( name => 'aaa', value => $params->{$key} );
-    }
-    return \%hash;
+has renderer => ( is => 'ro', lazy_build => 1 );
+sub _build_renderer {
+    my $self = shift;
+    my $config = $self->config->{renderer};
+    return Template->new( $config );
 }
 
+sub get_handler { shift->new()->handler }
 
 sub get_config {
     my( $self, $conf_file ) = @_; 
@@ -57,8 +37,5 @@ sub get_config {
     return $values[0];
 }
 
-no Bread::Board; # removes keywords
-
 1;
-
 
