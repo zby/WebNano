@@ -2,7 +2,7 @@ package WebNano::CRUDController;
 use Moose;
 use MooseX::MethodAttributes;
 
-extends 'WebNano::Controller';
+extends 'WebNano::ControllerCA';
 
 around 'handle' => sub {
     my( $orig, $self, @args ) = @_;
@@ -62,7 +62,7 @@ sub create : Action {
     use Moose;
     use MooseX::MethodAttributes;
 
-    extends 'WebNano::Controller';
+    extends 'WebNano::ControllerCA';
 
     has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
 

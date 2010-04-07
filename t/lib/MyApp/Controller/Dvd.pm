@@ -1,9 +1,7 @@
 package MyApp::Controller::Dvd_;
+use Moose;
 
-BEGIN{
-    use Moose; 
-    extends 'WebNano::Controller';
-}
+extends 'WebNano::Controller';
 
 around 'handle' => sub {
     my( $orig, $self, @args ) = @_;
@@ -29,13 +27,13 @@ around 'handle' => sub {
     return $self->$orig( @args );
 };
 
-sub index : Action {
+sub index_action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
     return $self->render( 'list.tt', { items => [ $rs->search ] } );
 }
 
-sub create : Action {
+sub create_action {
     my ( $self ) = @_;
     my $req = $self->request;
 
@@ -55,17 +53,16 @@ sub create : Action {
 
 package MyApp::Controller::Dvd;
 use Moose;
-use MooseX::MethodAttributes;
 
 extends 'WebNano::Controller';
 
-sub index : Action {
+sub index_action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
     return $self->render( 'list.tt', { items => [ $rs->search ] } );
 }
 
-sub create : Action {
+sub create_action {
     my ( $self ) = @_;
     my $req = $self->request;
 
@@ -83,7 +80,7 @@ sub create : Action {
     return $self->render( 'edit.tt', { form => $form->render } );
 }
 
-sub record : Action {
+sub record_action {
     my( $self, $id, $action ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
     my $record = $rs->find( $id );
@@ -105,25 +102,24 @@ sub record : Action {
 {
     package MyApp::Controller::Dvd::Record;
     use Moose;
-    use MooseX::MethodAttributes;
 
     extends 'WebNano::Controller';
 
     has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
 
-    sub index : Action {
+    sub index_action {
         my ( $self ) = @_;
 
-        return $self->view( );
+        return $self->view_action( );
     }
 
-    sub view : Action {
+    sub view_action {
         my ( $self ) = @_;
 
         return $self->render( 'record.tt', { record => $self->record } );
     }
 
-    sub delete : Action {
+    sub delete_action {
         my ( $self ) = @_;
         my $record = $self->record;
         if( $self->request->method eq 'GET' ){
@@ -137,7 +133,7 @@ sub record : Action {
         }
     }
 
-    sub edit : Action {
+    sub edit_action {
         my $self = shift;
         my $req = $self->request;
         my $form = DvdForm->new( 

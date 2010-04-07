@@ -2,7 +2,7 @@ package MyApp::Controller;
 
 BEGIN{
     use Moose;
-    extends 'WebNano::Controller';
+    extends 'WebNano::ControllerCA';
 }
 
 sub index : Action {
