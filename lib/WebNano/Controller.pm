@@ -21,7 +21,7 @@ sub render {
 
 sub controller_for {
     my ( $self, $path_part ) = @_;
-    my $controller_class = ref($self) . '::' . ucfirst $path_part;
+    my $controller_class = ref($self) . '::' . $path_part;
     Class::MOP::load_class( $controller_class );
     return $controller_class->new( 
         application => $self->application, 

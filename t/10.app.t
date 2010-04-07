@@ -13,13 +13,13 @@ test_psgi(
         my $cb = shift;
         my $res = $cb->(GET "/");
         like( $res->content, qr/This is the home page/ );
-        $res = $cb->(GET "/dvd");
+        $res = $cb->(GET "/Dvd");
         like( $res->content, qr/Jurassic Park II/ );
-        $res = $cb->(POST '/dvd/record/5/edit', [ name => 'Not Jurassic Park' ] );
+        $res = $cb->(POST '/Dvd/record/5/edit', [ name => 'Not Jurassic Park' ] );
         ok( $res->is_redirect, 'Redirect after POST' );
         $res = $cb->(GET $res->header('Location'));
         like( $res->content, qr/Not Jurassic Park/ );
-        $res = $cb->(POST '/dvd_/5/edit', [ name => 'Not even trace of Jurrasic Park' ] );
+        $res = $cb->(POST '/Dvd_/5/edit', [ name => 'Not even trace of Jurrasic Park' ] );
         ok( $res->is_redirect, 'Redirect after POST' );
         $res = $cb->(GET $res->header('Location'));
         like( $res->content, qr/Not even trace of Jurrasic Park/ );
