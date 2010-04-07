@@ -1,5 +1,5 @@
 package MyApp;
-use Moose;
+use Mouse;
 extends 'WebNano';
 use Config::Any;
 use Template;
@@ -17,6 +17,7 @@ has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
 sub _build_schema {
     my $self = shift;
     my $config = $self->config->{schema};
+    warn '_build_schema';
     return MyApp::DBSchema->connect( $config->{dbi_dsn}, $config->{user}, $config->{pass}, $config->{dbi_params} );
 }
 

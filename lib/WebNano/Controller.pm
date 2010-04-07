@@ -1,5 +1,5 @@
 package WebNano::Controller;
-use Any::Moose;
+use Mouse;
 use Class::MOP;
 
 has application => ( is => 'ro' );

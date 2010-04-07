@@ -1,5 +1,5 @@
 package MyApp::Controller::Dvd_;
-use Moose;
+use Mouse;
 
 extends 'WebNano::Controller';
 
@@ -52,7 +52,7 @@ sub create_action {
 }
 
 package MyApp::Controller::Dvd;
-use Moose;
+use Mouse;
 
 extends 'WebNano::Controller';
 
@@ -101,7 +101,7 @@ sub record_action {
 
 {
     package MyApp::Controller::Dvd::Record;
-    use Moose;
+    use Mouse;
 
     extends 'WebNano::Controller';
 

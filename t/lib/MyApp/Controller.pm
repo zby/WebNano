@@ -1,6 +1,6 @@
 package MyApp::Controller;
 
-use Moose;
+use Mouse;
 extends 'WebNano::Controller';
 
 sub index_action {
