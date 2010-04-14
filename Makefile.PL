@@ -6,6 +6,7 @@ author   q{Zbigniew Łukasiak <zby@cpan.org>};
 license  'perl';
 
 requires 'Moose';
+requires 'Any::Moose';
 requires 'Plack::Request';
 requires 'Scalar::Util';
 requires 'Class::MOP';
