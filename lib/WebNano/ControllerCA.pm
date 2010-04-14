@@ -1,5 +1,5 @@
 package WebNano::ControllerCA;
-use Mouse;
+use Moose;
 extends 'WebNano::Controller';
 
 sub find_action_ {
