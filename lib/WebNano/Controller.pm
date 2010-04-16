@@ -5,6 +5,7 @@ use Class::MOP;
 has application => ( is => 'ro' );
 has request     => ( is => 'ro', isa => 'Plack::Request', required => 1 );
 has self_url    => ( is => 'ro', isa => 'Str', required => 1 );
+has url_map     => ( is => 'ro', isa => 'Ref' );
 
 sub render {
     my ( $self, $template, $vars ) = @_;
@@ -31,6 +32,14 @@ sub controller_for {
 
 sub find_action_ {
     my ( $self, $name ) = @_;
+    if( my $map = $self->url_map ){
+        if( ref $map eq 'HASH' ){
+            return $map->{$name} if $map->{$name};
+        }
+        if( ref $map eq 'ARRAY' ){
+            return $name if grep { $_ eq $name } @$map;
+        }
+    }
     my $method = $name . '_action';
     return $method if $self->can( $method );
     return;

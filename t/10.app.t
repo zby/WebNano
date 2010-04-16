@@ -13,6 +13,10 @@ test_psgi(
         my $cb = shift;
         my $res = $cb->(GET "/");
         like( $res->content, qr/This is the home page/ );
+        my $res = $cb->(GET "/mapped url");
+        like( $res->content, qr/This is the mapped url page/ );
+        my $res = $cb->(GET "Dvd/safe_method");
+        like( $res->content, qr/This is the safe_method page/ );
         $res = $cb->(GET "/Dvd");
         like( $res->content, qr/Jurassic Park II/ );
         $res = $cb->(POST '/Dvd/record/5/edit', [ name => 'Not Jurassic Park' ] );

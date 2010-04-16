@@ -18,6 +18,7 @@ requires 'Config::General';
 requires 'HTML::FormHandler';
 requires 'HTML::FormHandler::Model::DBIC';
 requires 'MooseX::MethodAttributes';
+requires 'URI::Escape';
 
 build_requires 'Test::More';
 

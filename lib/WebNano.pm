@@ -5,6 +5,7 @@ use Any::Moose;
 use Plack::Request;
 use Scalar::Util qw(blessed);
 use Class::MOP;
+use URI::Escape 'uri_unescape';
 
 has renderer => ( is => 'ro' );
 
@@ -16,7 +17,7 @@ sub handler {
         my $c_class = ref($self) . '::Controller';
         Class::MOP::load_class( $c_class );
         my $controller = $c_class->new( application => $self, request => $req, self_url => '/' );
-        my @args = split /\//, $req->path;
+        my @args = split /\//, uri_unescape( $req->path );
         shift @args;
         my $out = $controller->handle( @args );
         my $res;

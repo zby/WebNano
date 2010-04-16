@@ -56,6 +56,10 @@ use Moose;
 
 extends 'WebNano::Controller';
 
+has '+url_map' => ( default => sub { [ 'safe_method' ] } );
+
+sub safe_method { 'This is the safe_method page' };
+
 sub index_action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
