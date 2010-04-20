@@ -1,10 +1,34 @@
-package MyApp::Controller::Dvd;
+package MyApp::Controller::DvdSimpleUrl;
 use Moose;
 
 extends 'WebNano::Controller';
 
 use MyApp::Controller::Dvd::Form;
 use MyApp::Controller::Dvd::Record;
+
+around 'handle' => sub {
+    my( $orig, $self, @args ) = @_;
+
+    if( $args[0] =~ /^\d+$/ ){
+        my $id = shift @args;
+        my $rs = $self->application->schema->resultset( 'Dvd' );
+        my $record = $rs->find( $id );
+        if( ! $record ) {
+            my $res = $self->request->new_response(404);
+            $res->content_type('text/plain');
+            $res->body( 'No record with id: ' . $id );
+            return $res;
+        }
+        my $new_controller = MyApp::Controller::Dvd::Record->new(
+            application => $self->application,
+            request => $self->request,
+            self_url => $self->self_url . "$id/",
+            record => $record,
+        );
+        return $new_controller->handle( @args );
+    }
+    return $self->$orig( @args );
+};
 
 sub index_action {
     my( $self ) = @_;
@@ -30,25 +54,5 @@ sub create_action {
     return $self->render( 'edit.tt', { form => $form->render } );
 }
 
-sub record_action {
-    my( $self, $id, $action ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
-    my $record = $rs->find( $id );
-    if( ! $record ) {
-        my $res = $self->request->new_response(404);
-        $res->content_type('text/plain');
-        $res->body( 'No record with id: ' . $id );
-        return $res;
-    }
-    my $new_controller = MyApp::Controller::Dvd::Record->new(
-        application => $self->application,
-        request => $self->request,
-        self_url => $self->self_url . "record/$id/",
-        record => $record,
-    );
-    return $new_controller->handle( $action );
-}
-
-
-
 1;
+
