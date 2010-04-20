@@ -15,6 +15,8 @@ test_psgi(
         like( $res->content, qr/This is the home page/ );
         $res = $cb->(GET "/mapped url");
         like( $res->content, qr/This is the mapped url page/ );
+        $res = $cb->(GET "SubController/some_method");
+        like( $res->content, qr/This is a method with _action postfix/ );
         $res = $cb->(GET "SubController/safe_method");
         like( $res->content, qr/This is the safe_method page/ );
         $res = $cb->(GET "/there_is_no_such_page");
