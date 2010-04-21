@@ -6,7 +6,7 @@ use Class::MOP;
 extends 'WebNano::Controller';
 with 'WebNano::Controller::CodeAttributesForMeta';
 
-has record_controller_class => ( is => 'ro', isa => 'Str', required => 1 );
+has record_controller_class => ( is => 'ro', isa => 'Str', required => 1, default => 'WebNano::Controller::CRUD::Record' );
 has form_class => ( is => 'ro', isa => 'Str', required => 1 );
 has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
 
