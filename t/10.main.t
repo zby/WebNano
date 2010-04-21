@@ -21,6 +21,8 @@ test_psgi(
         like( $res->content, qr/This is the safe_method page/ );
         $res = $cb->(GET "/there_is_no_such_page");
         is( $res->code, 404 , '404 for non existing controller' );
+        $res = $cb->(GET "/DoesNotCompile/");
+        is( $res->code, 500, '500 for controller that does not compile' );
      } 
 );
 

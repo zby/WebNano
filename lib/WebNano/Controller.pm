@@ -1,6 +1,7 @@
 package WebNano::Controller;
 use Any::Moose;
 use Class::MOP;
+use Try::Tiny;
 
 has application => ( is => 'ro' );
 has request     => ( is => 'ro', isa => 'Plack::Request', required => 1 );
@@ -22,7 +23,17 @@ sub render {
 sub controller_for {
     my ( $self, $path_part ) = @_;
     my $controller_class = ref($self) . '::' . $path_part;
-    Class::MOP::load_class( $controller_class );
+    my $loaded;
+    try{
+        Class::MOP::load_class( $controller_class );
+        $loaded = 1;
+    }
+    catch {
+        if( $_ !~ /Can't locate .*$path_part.pm in \@INC/ ){
+            die $_;
+        }
+    };
+    return if !$loaded;
     return $controller_class->new( 
         application => $self->application, 
         request => $self->request, 
@@ -53,7 +64,7 @@ sub handle {
     if ( my $action = $self->find_action_( $path_part ) ){
         return $self->$action( @args );
     }
-    elsif( my $new_controller = eval{ $self->controller_for( $path_part ) } ){
+    elsif( my $new_controller = $self->controller_for( $path_part ) ){
         return $new_controller->handle( @args );
     }
     else{

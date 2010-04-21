@@ -11,16 +11,16 @@ requires 'Plack::Request';
 requires 'Scalar::Util';
 requires 'Class::MOP';
 requires 'Plack::Test';
-requires 'Config::Any';
-requires 'DBIx::Class';
-#requires 'Path::Router';
-requires 'Config::General';
-requires 'HTML::FormHandler';
-requires 'HTML::FormHandler::Model::DBIC';
 requires 'MooseX::MethodAttributes';
 requires 'URI::Escape';
+requires 'Try::Tiny';
 
 build_requires 'Test::More';
+build_requires 'DBIx::Class';
+build_requires 'Config::Any';
+build_requires 'Config::General';
+build_requires 'HTML::FormHandler';
+build_requires 'HTML::FormHandler::Model::DBIC';
 
 auto_install;
 
