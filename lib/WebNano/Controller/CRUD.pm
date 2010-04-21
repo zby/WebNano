@@ -6,9 +6,9 @@ use Class::MOP;
 extends 'WebNano::Controller';
 with 'WebNano::Controller::CodeAttributesForMeta';
 
-has record_controller_class => ( is => 'ro', isa => 'Str', );
-has form_class => ( is => 'ro', isa => 'Str' );
-has rs_name => ( is => 'ro', isa => 'Str' );
+has record_controller_class => ( is => 'ro', isa => 'Str', required => 1 );
+has form_class => ( is => 'ro', isa => 'Str', required => 1 );
+has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
 
 around 'handle' => sub {
     my( $orig, $self, @args ) = @_;
@@ -69,13 +69,14 @@ sub create : Action {
     package WebNano::Controller::CRUD::Record;
     use Moose;
     use MooseX::MethodAttributes;
+    use Class::MOP;
 
     extends 'WebNano::Controller';
     with 'WebNano::Controller::CodeAttributesForMeta';
 
-    has form_class => ( is => 'ro', isa => 'Str' );
+    has form_class => ( is => 'ro', isa => 'Str', required => 1 );
 
-    has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
+    has record => ( isa => 'DBIx::Class::Row', is => 'ro', required => 1 );
 
     sub index : Action {
         my ( $self ) = @_;

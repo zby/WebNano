@@ -34,7 +34,7 @@ sub delete_action {
 sub edit_action {
     my $self = shift;
     my $req = $self->request;
-    my $form = DvdForm->new( 
+    my $form = MyApp::Controller::Dvd::Form->new( 
         item   => $self->record,
         params => $req->params, 
     );

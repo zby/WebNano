@@ -5,7 +5,7 @@ use MooseX::MethodAttributes;
 extends 'WebNano::Controller::CRUD';
 
 has '+record_controller_class' => ( default => 'MyApp::Controller::DvdWithBaseCRUD::Record' );
-has '+form_class' => ( default => 'CRUDDvdForm' );
+has '+form_class' => ( default => 'MyApp::Controller::Dvd::Form' );
 has '+rs_name' => ( default => 'Dvd' );
 
 package MyApp::Controller::DvdWithBaseCRUD::Record;

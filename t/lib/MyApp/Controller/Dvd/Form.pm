@@ -1,4 +1,4 @@
-package DvdForm;
+package MyApp::Controller::Dvd::Form;
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Model::DBIC';
 with 'HTML::FormHandler::Render::Simple';
