@@ -4,19 +4,15 @@ use MooseX::MethodAttributes;
 
 extends 'WebNano::Controller::CRUD';
 
-has record_controller_class => ( is => 'ro', isa => 'Str', default => 'MyApp::Controller::DvdWithBaseCRUD::Record' );
-has form_class => ( is => 'ro', isa => 'Str', default => 'CRUDDvdForm' );
-has rs_name => ( is => 'ro', isa => 'Str', default => 'Dvd' );
+has '+record_controller_class' => ( default => 'MyApp::Controller::DvdWithBaseCRUD::Record' );
+has '+form_class' => ( default => 'CRUDDvdForm' );
+has '+rs_name' => ( default => 'Dvd' );
 
 package MyApp::Controller::DvdWithBaseCRUD::Record;
 use Moose;
 use MooseX::MethodAttributes;
 
 extends 'WebNano::Controller::CRUD::Record';
-
-has form_class => ( is => 'ro', isa => 'Str', default => 'CRUDDvdForm' );
-has rs_name => ( is => 'ro', isa => 'Str', default => 'Dvd' );
-
 
 {
     package CRUDDvdForm;
