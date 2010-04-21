@@ -6,6 +6,10 @@ use Class::MOP;
 extends 'WebNano::Controller';
 with 'WebNano::Controller::CodeAttributesForMeta';
 
+has record_controller_class => ( is => 'ro', isa => 'Str', );
+has form_class => ( is => 'ro', isa => 'Str' );
+has rs_name => ( is => 'ro', isa => 'Str' );
+
 around 'handle' => sub {
     my( $orig, $self, @args ) = @_;
 
@@ -25,6 +29,7 @@ around 'handle' => sub {
             request => $self->request,
             self_url => $self->self_url . "$id/",
             record => $record,
+            form_class => $self->form_class,
         );
         return $new_controller->handle( @args );
     }
@@ -43,9 +48,7 @@ sub create : Action {
     my $req = $self->request;
 
     my $form_class = $self->form_class;
-    warn $form_class;
     Class::MOP::load_class( $form_class );
-    warn 'aaaaaaaaa';
     my $form = $form_class->new( 
         params => $req->params, 
         schema => $self->application->schema,
@@ -69,6 +72,8 @@ sub create : Action {
 
     extends 'WebNano::Controller';
     with 'WebNano::Controller::CodeAttributesForMeta';
+
+    has form_class => ( is => 'ro', isa => 'Str' );
 
     has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
 
@@ -102,16 +107,11 @@ sub create : Action {
         my $self = shift;
         my $req = $self->request;
         my $form_class = $self->form_class;
-        warn $form_class;
         Class::MOP::load_class( $form_class );
-        warn 'aaaaaaa';
-        warn ref $self->record;
-        $DB::single = 1;
         my $form = $form_class->new( 
             item   => $self->record,
             params => $req->params, 
         );
-        warn 'bbbbbb';
         if( $req->method eq 'POST' && $form->process() ){
             my $res = $req->new_response();
             $res->redirect( $self->self_url . '/view' );
