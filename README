@@ -10,7 +10,7 @@ but it is not a dependency - in the tests I build the components by hand.
 What is left is just
 dispatching (routing) - this is built around the following design ideas:
 
-Controllers (like Catalyst) with methods per sub-address 
+Controllers (like Catalyst) - classes with methods per sub-address 
 
 Dispatching (routing) in controllers
 
@@ -29,6 +29,14 @@ done in the request scope (i.e. creating the request) - then it makes sense
 that the whole object lives in that scope.  This is the same as Tatsumaki
 handlers (and controllers in Rails, Django and probably other frameworks) -
 but different from Catalyst.
+
+DEPENDENCIES
+
+The core of WebNano is based on Any::Moose - that is it can use Moose or Mouse.
+Beside that there are only minimal dependencies for the core - but for testing
+the whole concept I use FormHandler and DBIC - this should eventually go into
+examples and other distros but for now it is convenient for me to keep it in 
+the main repository.
 
 
 INSTALLATION

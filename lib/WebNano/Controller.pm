@@ -81,22 +81,47 @@ __END__
 
 =head1 NAME
 
-WebNano - Really minimalistic web framework
-
-
-=head1 VERSION
-
-This document describes WebNano::Controller version 0.001
+WebNano::Controller 
 
 =head1 SYNOPSIS
 
-    extend WebNano;
-  
+    package MyApp::Controller;
+    
+    use Moose;
+    extends 'WebNano::Controller';
+    
+    has '+url_map' => ( default => sub { { 'mapped url' => 'mapped_url' } } );
+    
+    sub index_action {
+        my $self = shift;
+        return $self->render( 'index.tt' );
+    }
+    
+    sub mapped_url { 'This is the mapped url page' }
+    
+    1;
+
+
 =head1 DESCRIPTION
+
+The first parameter to the handle method is expected to be the name of the action
+to be called.  The default value of that parameter is 'index'.
+The corresponding method name is retrieved from the (optional) url_map
+hash attribute or is created by adding the '_action' postfix.
+
+The action method should return a a string containing the HTML page or
+a Plack::Response object.
+
+If there is no suitable method in the current class child controller classes 
+are tried out (their name is mapped literally).  If there is found one that 
+matches the path part then it is instantiated with the current request
+and it's handle method is called.
 
 =head1 METHODS
 
 =head2 handle
+
+Dispatches the request to the action methods as described above.
 
 Returns a Plack::Response object or a string containing the HTML page.
 
@@ -108,12 +133,13 @@ Finds a next controller to forward to according to the first path part.
 
 Renders a template.
 
-=head2 is_action
+=head2 find_action_
 
-Checks if a method is callable from the web.
+Finds the method to be called for a path part.
 
 =head1 ATTRIBUTES
 
+=head2 url_map
 =head2 application
 =head2 request
 =head2 self_url

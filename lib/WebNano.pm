@@ -73,7 +73,7 @@ This also leads to the elegant design of recursive dispatching -
 you start from the root controller it then serves the request or
 chooses another controller where the same thing happens
 (sometimes called tree of resposibility - extension of the chain of responsibility 
-design pattern).
+design pattern).  See L<WebNano::Controller> for more info on dispatching.
 
 =head2 Controller object live in the request scope (new controller per request)
 
