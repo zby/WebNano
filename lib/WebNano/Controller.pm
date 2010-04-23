@@ -45,15 +45,14 @@ sub find_action_ {
     my ( $self, $name ) = @_;
     if( my $map = $self->url_map ){
         if( ref $map eq 'HASH' ){
-            return $map->{$name} if $map->{$name};
+            return $self->can( $map->{$name} ) if $map->{$name};
         }
         if( ref $map eq 'ARRAY' ){
-            return $name if grep { $_ eq $name } @$map;
+            return $self->can( $name ) if grep { $_ eq $name } @$map;
         }
     }
     my $method = $name . '_action';
-    return $method if $self->can( $method );
-    return;
+    return $self->can( $method );
 }
 
 sub handle {
@@ -62,7 +61,7 @@ sub handle {
     $path_part =~ s/::|'//g if defined( $path_part );
     $path_part = 'index' if !defined( $path_part ) || !length( $path_part );
     if ( my $action = $self->find_action_( $path_part ) ){
-        return $self->$action( @args );
+        return $action->( $self, @args );
     }
     elsif( my $new_controller = $self->controller_for( $path_part ) ){
         return $new_controller->handle( @args );

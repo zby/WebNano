@@ -5,7 +5,7 @@ sub find_action_ {
     my ( $self, $name ) = @_;
     my $meta = $self->meta->find_method_by_name($name);
     return unless $meta && grep { $_ eq 'Action' } @{ $meta->attributes };
-    return $name;
+    return $self->can( $name );
 }
 
 1;
