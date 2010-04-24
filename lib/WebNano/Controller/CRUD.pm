@@ -11,10 +11,9 @@ has form_class => ( is => 'ro', isa => 'Str', required => 1 );
 has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
 
 around 'handle' => sub {
-    my( $orig, $self, @args ) = @_;
-
-    if( defined $args[0] and $args[0] =~ /^\d+$/ ){
-        my $id = shift @args;
+    my( $orig, $self, $path ) = @_;
+    my( $id, $new_path ) = ( $path =~ qr{^(\d+)/?(.*)} );
+    if( $id ){
         my $rs = $self->application->schema->resultset( $self->rs_name );
         my $record = $rs->find( $id );
         if( ! $record ) {
@@ -31,9 +30,9 @@ around 'handle' => sub {
             record => $record,
             form_class => $self->form_class,
         );
-        return $new_controller->handle( @args );
+        return $new_controller->handle( $new_path );
     }
-    return $self->$orig( @args );
+    return $self->$orig( $path );
 };
 
 

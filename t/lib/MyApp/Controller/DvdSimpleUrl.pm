@@ -7,10 +7,9 @@ use MyApp::Controller::Dvd::Form;
 use MyApp::Controller::Dvd::Record;
 
 around 'handle' => sub {
-    my( $orig, $self, @args ) = @_;
-
-    if( $args[0] =~ /^\d+$/ ){
-        my $id = shift @args;
+    my( $orig, $self, $path ) = @_;
+    my( $id, $new_path ) = ( $path =~ qr{^(\d+)/?(.*)} );
+    if( $id ){
         my $rs = $self->application->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
         if( ! $record ) {
@@ -25,9 +24,9 @@ around 'handle' => sub {
             self_url => $self->self_url . "$id/",
             record => $record,
         );
-        return $new_controller->handle( @args );
+        return $new_controller->handle( $new_path );
     }
-    return $self->$orig( @args );
+    return $self->$orig( $path );
 };
 
 sub index_action {

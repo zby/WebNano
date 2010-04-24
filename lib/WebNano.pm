@@ -5,7 +5,6 @@ use Any::Moose;
 use Plack::Request;
 use Scalar::Util qw(blessed);
 use Class::MOP;
-use URI::Escape 'uri_unescape';
 
 has renderer => ( is => 'ro' );
 
@@ -17,18 +16,9 @@ sub handler {
         my $c_class = ref($self) . '::Controller';
         Class::MOP::load_class( $c_class );
         my $controller = $c_class->new( application => $self, request => $req, self_url => '/' );
-        my @args = split /\//, uri_unescape( $req->path );
-        shift @args;
-        my $out = $controller->handle( @args );
-        my $res;
-        if( blessed $out and $out->isa( 'Plack::Response' ) ){
-            $res = $out;
-        }
-        else{
-            $res = $req->new_response(200);
-            $res->content_type('text/html');
-            $res->body( $out );
-        }
+        my $path = $req->path;
+        $path =~ s{^/}{};
+        my $res = $controller->handle( $path );
         return $res->finalize;
     };
 }

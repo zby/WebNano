@@ -2,6 +2,9 @@ package WebNano::Controller;
 use Any::Moose;
 use Class::MOP;
 use Try::Tiny;
+use URI::Escape 'uri_unescape';
+use Plack::Request;
+
 
 has application => ( is => 'ro' );
 has request     => ( is => 'ro', isa => 'Plack::Request', required => 1 );
@@ -21,7 +24,10 @@ sub render {
 }
 
 sub controller_for {
-    my ( $self, $path_part ) = @_;
+    my ( $self, $path ) = @_;
+    my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
+    $path_part =~ s/::|'//g if defined( $path_part );
+    return if !length( $path_part );
     my $controller_class = ref($self) . '::' . $path_part;
     my $loaded;
     try{
@@ -34,37 +40,50 @@ sub controller_for {
         }
     };
     return if !$loaded;
-    return $controller_class->new( 
+    my $new_controller = $controller_class->new( 
         application => $self->application, 
         request => $self->request, 
         self_url => $self->self_url . $path_part  . '/',
     );
+    return ( $new_controller, $new_path );
 }
 
-sub find_action_ {
-    my ( $self, $name ) = @_;
+sub local_dispatch {
+    my ( $self, $path ) = @_;
+    my @parts = split /\//, $path;
+    my $name = uri_unescape( shift @parts );
+    $name = 'index' if !defined( $name ) || !length( $name );
+    my $action;
     if( my $map = $self->url_map ){
         if( ref $map eq 'HASH' ){
-            return $self->can( $map->{$name} ) if $map->{$name};
+            $action = $self->can( $map->{$name} ) if $map->{$name};
         }
         if( ref $map eq 'ARRAY' ){
-            return $self->can( $name ) if grep { $_ eq $name } @$map;
+            $action = $self->can( $name ) if grep { $_ eq $name } @$map;
         }
     }
     my $method = $name . '_action';
-    return $self->can( $method );
+    $action = $self->can( $method ) if !$action;
+    return if !$action;
+    my $out = $action->( $self, @parts );
+    my $res;
+    if( blessed $out and $out->isa( 'Plack::Response' ) ){
+        $res = $out;
+    }
+    else{
+        $res = $self->request->new_response(200);
+        $res->content_type('text/html');
+        $res->body( $out );
+    }
+    return $res;
 }
 
 sub handle {
-    my ( $self, @args ) = @_;
-    my $path_part = shift @args;
-    $path_part =~ s/::|'//g if defined( $path_part );
-    $path_part = 'index' if !defined( $path_part ) || !length( $path_part );
-    if ( my $action = $self->find_action_( $path_part ) ){
-        return $action->( $self, @args );
-    }
-    elsif( my $new_controller = $self->controller_for( $path_part ) ){
-        return $new_controller->handle( @args );
+    my ( $self, $path ) = @_;
+    my $res = $self->local_dispatch( $path );
+    return $res if defined $res;
+    if( my ( $new_controller, $new_path ) = $self->controller_for( $path ) ){
+        return $new_controller->handle( $new_path );
     }
     else{
         my $res = $self->request->new_response(404);
@@ -126,15 +145,15 @@ Returns a Plack::Response object or a string containing the HTML page.
 
 =head2 controller_for
 
-Finds a next controller to forward to according to the first path part.
+Finds a next controller to forward to according to the path.
 
 =head2 render
 
 Renders a template.
 
-=head2 find_action_
+=head2 local_dispatch
 
-Finds the method to be called for a path part.
+Finds the method to be called for a path and dispatches to it.
 
 =head1 ATTRIBUTES
 
