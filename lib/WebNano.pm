@@ -15,10 +15,9 @@ sub handler {
         my $req = Plack::Request->new(shift);
         my $c_class = ref($self) . '::Controller';
         Class::MOP::load_class( $c_class );
-        my $controller = $c_class->new( application => $self, request => $req, self_url => '/' );
         my $path = $req->path;
         $path =~ s{^/}{};
-        my $res = $controller->handle( $path );
+        my $res = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
         return $res->finalize;
     };
 }

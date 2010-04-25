@@ -40,12 +40,7 @@ sub controller_for {
         }
     };
     return if !$loaded;
-    my $new_controller = $controller_class->new( 
-        application => $self->application, 
-        request => $self->request, 
-        self_url => $self->self_url . $path_part  . '/',
-    );
-    return ( $new_controller, $new_path );
+    return ( $controller_class, $new_path, $self->self_url . $path_part  . '/' );
 }
 
 sub local_dispatch {
@@ -79,11 +74,18 @@ sub local_dispatch {
 }
 
 sub handle {
-    my ( $self, $path ) = @_;
+    my ( $class, %args ) = @_;
+    my $path = delete $args{path};
+    my $self = $class->new( %args );
     my $res = $self->local_dispatch( $path );
     return $res if defined $res;
-    if( my ( $new_controller, $new_path ) = $self->controller_for( $path ) ){
-        return $new_controller->handle( $new_path );
+    if( my ( $new_controller, $new_path, $new_self_url ) = $self->controller_for( $path ) ){
+        return $new_controller->handle(
+            path => $new_path,  
+            self_url => $new_self_url,
+            request => $args{request},
+            application => $args{application}
+        );
     }
     else{
         my $res = $self->request->new_response(404);
@@ -122,15 +124,10 @@ WebNano::Controller
 
 =head1 DESCRIPTION
 
-The first parameter to the handle method is expected to be the name of the action
-to be called.  The default value of that parameter is 'index'.
-The corresponding method name is retrieved from the (optional) url_map
-hash attribute or is created by adding the '_action' postfix.
-
 The action method should return a a string containing the HTML page or
 a Plack::Response object.
 
-If there is no suitable method in the current class child controller classes 
+If there is no suitable method in the current class, child controller classes 
 are tried out (their name is mapped literally).  If there is found one that 
 matches the path part then it is instantiated with the current request
 and it's handle method is called.

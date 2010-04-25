@@ -11,9 +11,10 @@ has form_class => ( is => 'ro', isa => 'Str', required => 1 );
 has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
 
 around 'handle' => sub {
-    my( $orig, $self, $path ) = @_;
-    my( $id, $new_path ) = ( $path =~ qr{^(\d+)/?(.*)} );
+    my( $orig, $class, %args ) = @_;
+    my( $id, $new_path ) = ( $args{path} =~ qr{^(\d+)/?(.*)} );
     if( $id ){
+        my $self = $class->new( %args );
         my $rs = $self->application->schema->resultset( $self->rs_name );
         my $record = $rs->find( $id );
         if( ! $record ) {
@@ -23,16 +24,16 @@ around 'handle' => sub {
             return $res;
         }
         my $rec_class = $self->record_controller_class;
-        my $new_controller = $rec_class->new(
+        return $rec_class->handle( 
+            path => $new_path,
             application => $self->application,
             request => $self->request,
             self_url => $self->self_url . "$id/",
             record => $record,
             form_class => $self->form_class,
         );
-        return $new_controller->handle( $new_path );
     }
-    return $self->$orig( $path );
+    return $class->$orig( %args );
 };
 
 

@@ -40,13 +40,13 @@ sub record_action {
         $res->body( 'No record with id: ' . $id );
         return $res;
     }
-    my $new_controller = MyApp::Controller::Dvd::Record->new(
+    return MyApp::Controller::Dvd::Record->handle( 
+        path => $action,
         application => $self->application,
         request => $self->request,
         self_url => $self->self_url . "record/$id/",
         record => $record,
     );
-    return $new_controller->handle( $action );
 }
 
 
