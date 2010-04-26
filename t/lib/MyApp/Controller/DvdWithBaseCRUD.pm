@@ -1,6 +1,5 @@
 package MyApp::Controller::DvdWithBaseCRUD;
 use Moose;
-use MooseX::MethodAttributes;
 
 extends 'WebNano::Controller::CRUD';
 

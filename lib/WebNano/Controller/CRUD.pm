@@ -1,6 +1,5 @@
 package WebNano::Controller::CRUD;
 use Moose;
-use MooseX::MethodAttributes;
 use Class::MOP;
 
 extends 'WebNano::Controller';
