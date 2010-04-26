@@ -4,13 +4,18 @@ use Moose;
 extends 'WebNano::Controller';
 
 use MyApp::Controller::Dvd::Form;
-use MyApp::Controller::Dvd::Record;
 
-around 'handle' => sub {
-    my( $orig, $class, %args ) = @_;
-    my( $id, $new_path ) = ( $args{path} =~ qr{^(\d+)/?(.*)} );
-    if( $id ){
-        my $self = $class->new( %args );
+has record_methods => ( 
+    is => 'ro', 
+    isa => 'HashRef', 
+    default => sub { { view => 1, 'delete' => 1, edit => 1 } }
+);
+
+around 'local_dispatch' => sub {
+    my( $orig, $self, $path) = @_;
+    my( $id, $method, @args ) = split qr{/}, $path;
+    $method ||= 'view';
+    if( $id && $id =~ /^\d+$/ && $self->record_methods->{ $method } ){
         my $rs = $self->application->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
         if( ! $record ) {
@@ -19,15 +24,9 @@ around 'handle' => sub {
             $res->body( 'No record with id: ' . $id );
             return $res;
         }
-        return MyApp::Controller::Dvd::Record->handle( 
-            path => $new_path,
-            application => $self->application,
-            request => $self->request,
-            self_url => $self->self_url . "$id/",
-            record => $record,
-        );
+        return $self->$method( $record, @args );
     }
-    return $class->$orig( %args );
+    return $self->$orig( $path );
 };
 
 sub index_action {
@@ -51,6 +50,41 @@ sub create_action {
         return $res;
     }
     $form->field( 'submit' )->value( 'Create' );
+    return $self->render( 'edit.tt', { form => $form->render } );
+}
+
+sub view {
+    my ( $self, $record ) = @_;
+
+    return $self->render( 'record.tt', { record => $record } );
+}
+
+sub delete {
+    my ( $self, $record ) = @_;
+    if( $self->request->method eq 'GET' ){
+        return $self->render( 'delete.tt', { record => $record } );
+    }
+    else{
+        $record->delete;
+        my $res = $self->request->new_response();
+        $res->redirect( $self->self_url );
+        return $res;
+    }
+}
+
+sub edit {
+    my ( $self, $record ) = @_;
+    my $req = $self->request;
+    my $form = MyApp::Controller::Dvd::Form->new( 
+        item   => $record,
+        params => $req->params, 
+    );
+    if( $req->method eq 'POST' && $form->process() ){
+        my $res = $req->new_response();
+        $res->redirect( $self->self_url . '/' . $record->id . '/view' );
+        return $res;
+    }
+    $form->field( 'submit' )->value( 'Update' );
     return $self->render( 'edit.tt', { form => $form->render } );
 }
 
