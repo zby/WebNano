@@ -37,7 +37,7 @@ around 'local_dispatch' => sub {
         }
         return $self->$method( $record, @args );
     }
-    if( $self->class_actions->{$path_part} ){
+    if( defined $path_part && $self->class_actions->{$path_part} ){
         return $self->$path_part( $method, @args );
     }
     return $self->$orig( $path );

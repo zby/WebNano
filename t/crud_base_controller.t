@@ -11,7 +11,7 @@ test_psgi(
     app => MyApp->get_handler, 
     client => sub {
         my $cb = shift;
-        $res = $cb->(GET "/DvdWithBaseCRUD/list");
+        $res = $cb->(GET "/DvdWithBaseCRUD/");
         like( $res->content, qr/Jurassic Park II/ );
         $res = $cb->(POST '/DvdWithBaseCRUD/5/edit', [ name => 'Not Jurassic Park' ] );
         ok( $res->is_redirect, 'Redirect after POST' );
