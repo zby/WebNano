@@ -17,8 +17,16 @@ sub handler {
         Class::MOP::load_class( $c_class );
         my $path = $req->path;
         $path =~ s{^/}{};
-        my $res = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
-        return $res->finalize;
+        my $out = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
+        if( blessed $out and $out->isa( 'Plack::Response' ) ){
+            return $out->finalize;
+        }
+        else{
+            my $res = $req->new_response(200);
+            $res->content_type('text/html');
+            $res->body( $out );
+            return $res->finalize;
+        }
     };
 }
 

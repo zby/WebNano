@@ -60,25 +60,15 @@ sub local_dispatch {
     my $method = $name . '_action';
     $action = $self->can( $method ) if !$action;
     return if !$action;
-    my $out = $action->( $self, @parts );
-    my $res;
-    if( blessed $out and $out->isa( 'Plack::Response' ) ){
-        $res = $out;
-    }
-    else{
-        $res = $self->request->new_response(200);
-        $res->content_type('text/html');
-        $res->body( $out );
-    }
-    return $res;
+    return $action->( $self, @parts );
 }
 
 sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    my $res = $self->local_dispatch( $path );
-    return $res if defined $res;
+    my $out = $self->local_dispatch( $path );
+    return $out if defined $out;
     if( my ( $new_controller, $new_path, $new_self_url ) = $self->controller_for( $path ) ){
         return $new_controller->handle(
             path => $new_path,  
@@ -110,7 +100,7 @@ WebNano::Controller
     use Moose;
     extends 'WebNano::Controller';
     
-    has '+url_map' => ( default => sub { { 'mapped url' => 'mapped_url' } } );
+    has '+url_map' => ( default => sub { { 'Mapped Url' => 'mapped_url' } } );
     
     sub index_action {
         my $self = shift;
@@ -123,6 +113,9 @@ WebNano::Controller
 
 
 =head1 DESCRIPTION
+
+This is the WebNano base controller. It's handle method dispatches the request
+to appropriate action method.
 
 The action method should return a a string containing the HTML page or
 a Plack::Response object.
