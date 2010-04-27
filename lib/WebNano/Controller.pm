@@ -40,6 +40,7 @@ sub controller_for {
         }
     };
     return if !$loaded;
+    return if !$controller_class->DOES( 'WebNano::Controller' );
     return ( $controller_class, $new_path, $self->self_url . $path_part  . '/' );
 }
 
