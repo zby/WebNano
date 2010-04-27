@@ -11,7 +11,7 @@ test_psgi(
         my $cb = shift;
         my $res = $cb->(GET "/WebDispatchTable");
         like( $res->content, qr/This is index in web_dispatch table/ );
-        my $res = $cb->(GET "/WebDispatchTable/some_address");
+        $res = $cb->(GET "/WebDispatchTable/some_address");
         like( $res->content, qr/This is some_address in web_dispatch table/ );
      } 
 );
