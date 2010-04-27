@@ -5,7 +5,11 @@ delegate as much as possible to specialized CPAN modules with minimal hassle.
 
 It currently uses: PSGI/Plack tools to ease deployment and testing. 
 For building the application components I experiment with using Bread::Board - 
-but it is not a dependency - in the tests I build the components by hand.
+but it is not a dependency - in the tests I build the components by hand. 
+Currently the repository contains also example extensions (all in the
+lib/WebNano/Controller/ directory) - it is convenient this way - but 
+eventually they'll go into separate distributions or will be left in the
+examples subdir.
 
 What is left is just
 dispatching (routing) - this is built around the following design ideas:
