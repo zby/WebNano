@@ -1,17 +1,18 @@
 WebNano version 0.001
 
-This is a minimalistic web framework - the main design goal of it is to
-delegate as much as possible to specialized CPAN modules with minimal hassle. 
+This is a minimalistic PSGI/Plack based web framework - the main design goal 
+of it is to delegate as much as possible to specialized CPAN modules with 
+minimal hassle. 
 
-It currently uses: PSGI/Plack tools to ease deployment and testing. 
-For building the application components I experiment with using Bread::Board - 
-but it is not a dependency - in the tests I build the components by hand. 
-Currently the repository contains also example extensions (all in the
-lib/WebNano/Controller/ directory) - it is convenient this way - but 
+Currently the repository contains also example extensions (everything in the
+lib/WebNano/Controller/ directory).  It is convenient this way - but 
 eventually they'll go into separate distributions or will be left in the
 examples subdir.
 
-What is left is just
+For building the application components I experiment with using Bread::Board - 
+but it is not a dependency - in the tests I build the components by hand. 
+
+What is currently implemented is just
 dispatching (routing) - this is built around the following design ideas:
 
 Controllers (like Catalyst) - classes with methods per sub-address 
