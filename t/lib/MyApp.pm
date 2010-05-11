@@ -27,8 +27,6 @@ sub _build_renderer {
     return Template->new( $config );
 }
 
-sub get_handler { shift->new()->handler }
-
 sub get_config {
     my( $self, $conf_file ) = @_; 
     

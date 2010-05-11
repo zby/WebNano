@@ -8,8 +8,9 @@ use Class::MOP;
 
 has renderer => ( is => 'ro' );
 
-sub handler {
-    my $self = shift;
+sub get_handler {
+    my $class = shift;
+    my $self = $class->new;
 
     sub {
         my $req = Plack::Request->new(shift);
@@ -86,9 +87,11 @@ other frameworks) - but different from Catalyst.
 
 =head1 ATTRIBUTES and METHODS
 
-=head2 handler
+=head2 get_handler
 
-Returns a subroutine (with closure) suitable for handling PSGI request arrays.
+This is a class method which returns a subroutine (with closure) suitable for PSGI.
+It creates a new object of the class and then makes a closure over it.
+
 
 =head1 DIAGNOSTICS
 
