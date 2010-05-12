@@ -1,4 +1,5 @@
 use MyApp;
-MyApp->get_handler;
+my $app = MyApp->new();
+$app->get_handler;
 
 

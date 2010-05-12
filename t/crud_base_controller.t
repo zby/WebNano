@@ -8,7 +8,7 @@ use File::Copy;
 copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
 
 test_psgi( 
-    app => MyApp->get_handler, 
+    app => MyApp->new()->get_handler, 
     client => sub {
         my $cb = shift;
         $res = $cb->(GET "/DvdWithBaseCRUD/");

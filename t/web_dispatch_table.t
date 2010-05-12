@@ -6,7 +6,7 @@ use MyApp;
 use File::Copy;
 
 test_psgi( 
-    app => MyApp->get_handler, 
+    app => MyApp->new()->get_handler, 
     client => sub {
         my $cb = shift;
         my $res = $cb->(GET "/WebDispatchTable");
