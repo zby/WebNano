@@ -1,9 +1,12 @@
+use strict;
+use warnings;
+
 package MyApp::Controller::Dvd::Record;
-use Moose;
 
-extends 'WebNano::Controller';
+use base 'WebNano::Controller';
 
-has record => ( isa => 'DBIx::Class::Row', is => 'ro' );
+use Class::XSAccessor { accessors => [ qw/ record / ], };
+
 
 sub index_action {
     my ( $self ) = @_;

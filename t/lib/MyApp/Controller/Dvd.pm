@@ -1,8 +1,8 @@
-package MyApp::Controller::Dvd;
-use Moose;
-use MooseX::NonMoose;
+use strict;
+use warnings;
 
-extends 'WebNano::Controller';
+package MyApp::Controller::Dvd;
+use base 'WebNano::Controller';
 
 use MyApp::Controller::Dvd::Form;
 use MyApp::Controller::Dvd::Record;
