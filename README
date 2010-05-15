@@ -37,9 +37,10 @@ but different from Catalyst.
 
 DEPENDENCIES
 
-The core of WebNano is based on Any::Moose - that is it can use Moose or Mouse.
-Beside that there are only minimal dependencies for the core - but for testing
-the whole concept I use FormHandler and DBIC - this should eventually go into
+The core of WebNano is based on Class::XSAttributes.
+Beside that there are only minimal dependencies for the core - but there are
+a couple of extensions illustrating how to implement different dispatching
+methods and also for testing I use FormHandler and DBIC - those would eventually go into
 examples and other distros but for now it is convenient for me to keep it in 
 the main repository.
 

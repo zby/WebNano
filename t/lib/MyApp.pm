@@ -1,5 +1,6 @@
 package MyApp;
 use Moose;
+use MooseX::NonMoose;
 extends 'WebNano';
 use Config::Any;
 use Template;

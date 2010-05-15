@@ -1,5 +1,6 @@
 package MyApp::Controller::Dvd;
 use Moose;
+use MooseX::NonMoose;
 
 extends 'WebNano::Controller';
 

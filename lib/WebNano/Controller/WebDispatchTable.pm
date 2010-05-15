@@ -2,6 +2,7 @@ package WebNano::Controller::WebDispatchTable;
 
 use WebNano::Controller::Meta::Class::Trait::WebDispatchTable;
 use Moose -traits => 'WebDispatchTable';
+use MooseX::NonMoose;
 extends 'WebNano::Controller';
 
 sub handle {

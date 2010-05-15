@@ -1,15 +1,15 @@
+use strict;
+use warnings;
+
 package WebNano::Controller;
-use Any::Moose;
-use Class::MOP;
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
 
-
-has application => ( is => 'ro' );
-has request     => ( is => 'ro', isa => 'Plack::Request', required => 1 );
-has self_url    => ( is => 'ro', isa => 'Str', required => 1 );
-has url_map     => ( is => 'ro', isa => 'Ref' );
+use Class::XSAccessor { 
+    accessors => [ qw/ application request self_url url_map / ], 
+    constructor => 'new' 
+};
 
 sub render {
     my ( $self, $template, $vars ) = @_;
@@ -31,7 +31,10 @@ sub controller_for {
     my $controller_class = ref($self) . '::' . $path_part;
     my $loaded;
     try{
-        Class::MOP::load_class( $controller_class );
+        my $controller_file = $controller_class;
+        $controller_file =~ s{::}{/}g;
+        $controller_file .= '.pm';
+        require $controller_file;
         $loaded = 1;
     }
     catch {
@@ -40,7 +43,7 @@ sub controller_for {
         }
     };
     return if !$loaded;
-    return if !$controller_class->DOES( 'WebNano::Controller' );
+    return if !$controller_class->isa( 'WebNano::Controller' );
     return ( $controller_class, $new_path, $self->self_url . $path_part  . '/' );
 }
 

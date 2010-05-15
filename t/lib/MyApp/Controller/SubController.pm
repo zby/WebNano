@@ -1,9 +1,10 @@
 package MyApp::Controller::SubController;
 use Moose;
+use MooseX::NonMoose;
 
 extends 'WebNano::Controller';
 
-has '+url_map' => ( default => sub { [ 'safe_method' ] } );
+has 'url_map' => ( is => 'ro', default => sub { [ 'safe_method' ] } );
 
 sub safe_method { 'This is the safe_method page' }
 

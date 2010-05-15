@@ -7,6 +7,8 @@ license  'perl';
 
 requires 'Moose';
 requires 'Any::Moose';
+requires 'MooseX::NonMoose';
+requires 'Class::XSAccessor';
 requires 'Plack::Request';
 requires 'Scalar::Util';
 requires 'Class::MOP';

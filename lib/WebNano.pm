@@ -1,12 +1,12 @@
+use strict;
+use warnings;
+
 package WebNano;
 
 our $VERSION = '0.001';
-use Any::Moose;
 use Plack::Request;
 use Scalar::Util qw(blessed);
-use Class::MOP;
-
-has renderer => ( is => 'ro' );
+use Class::XSAccessor { accessors => [ 'renderer' ], constructor => 'new' };
 
 sub get_handler {
     my $self = shift;
@@ -14,7 +14,7 @@ sub get_handler {
     sub {
         my $req = Plack::Request->new(shift);
         my $c_class = ref($self) . '::Controller';
-        Class::MOP::load_class( $c_class );
+        eval "require $c_class";
         my $path = $req->path;
         $path =~ s{^/}{};
         my $out = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
@@ -60,7 +60,6 @@ to build the application components.  What is left is just dispatching (routing)
 is built around the following design ideas:
 
 =head2 Controllers (like Catalyst) with methods per sub-address 
-
 
 =head2 Dispatching (routing) in controllers
 
