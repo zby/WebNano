@@ -36,40 +36,52 @@ __END__
 
 =head1 NAME
 
-WebNano - Really minimalistic web framework
+WebNano - Really minimalistic PSGI based web framework
 
 
 =head1 VERSION
 
 This document describes WebNano version 0.001
 
-
 =head1 SYNOPSIS
-
-    extend WebNano;
 
 See the example in t/lib/MyApp
 
 =head1 DESCRIPTION
 
-This is a minimalistic web framework - the main design goal of it is to delegate as much
-as possible to specialized CPAN modules with minimal hassle. 
+The design goal numer one here is to provide basic functionality that should cover most 
+of use cases and a easy way to override it and extend.
+The design goal number two is to delegate as much as possible to specialized
+CPAN modules with minimal hassle.  
 
-It currently uses: PSGI/Plack tools to ease deployment and testing and Bread::Board
-to build the application components.  What is left is just dispatching (routing) - this
-is built around the following design ideas:
+The main functionality is simple mapping (dispatching) of HTTP request paths into method
+calls as in the following example:
 
-=head2 Controllers (like Catalyst) with methods per sub-address 
+    '/' -> 'MyApp::Controller->index_action()'
+    '/page' -> 'MyApp::Controller->page_action()'
+    '/Some/Very/long/path' -> 'MyApp::Controller::Some::Very->long_action( 'path' )
 
-=head2 Dispatching (routing) in controllers
+The name of the action subroutine needs to end with '_action' postfix or alternatively 
+the mapping of the last part of the path to the subroutine name can be provided with
+'url_map' which can be an array of sub names or a hash of mappings (like run_modes 
+in CGI::Application).
 
-This makes controllers more independent from the whole application and 
-mixable with more flexibility.
-This also leads to the elegant design of recursive dispatching -
-you start from the root controller it then serves the request or
-chooses another controller where the same thing happens
-(sometimes called tree of resposibility - extension of the chain of responsibility 
-design pattern).  See L<WebNano::Controller> for more info on dispatching.
+The examples in 'extensions' show how one can extend this basic dispatching with
+other dispatching 'flavours': 
+
+WebDispatchTable shows how to create a DSL for dispatching (ala Dancer):
+
+    get '/some_address' => sub { 'This is some_address in web_dispatch table' };
+
+CodeAttributesForMeta shows how to add an 'Action' code attribute (ala Catalyst):
+
+    sub index : Action { 'This is the index page' }
+
+CRUD shows how to create an encapsulated CRUD controller code
+
+This mapping is done inside Controller code - so it can be easily overridden
+and extended on per directory basis.  This should allow one to create
+self-contained controllers that fully encapsulate some specialized functionality.
 
 =head2 Controller object live in the request scope (new controller per request)
 

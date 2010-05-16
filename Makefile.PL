@@ -5,18 +5,18 @@ all_from 'lib/WebNano.pm';
 author   q{Zbigniew Łukasiak <zby@cpan.org>};
 license  'perl';
 
-requires 'Moose';
-requires 'Any::Moose';
-requires 'MooseX::NonMoose';
 requires 'Class::XSAccessor';
 requires 'Plack::Request';
 requires 'Scalar::Util';
-requires 'Class::MOP';
 requires 'Plack::Test';
-requires 'MooseX::MethodAttributes';
 requires 'URI::Escape';
 requires 'Try::Tiny';
 
+build_requires 'Moose';
+build_requires 'Any::Moose';
+build_requires 'MooseX::NonMoose';
+build_requires 'MooseX::MethodAttributes';
+build_requires 'Class::MOP';
 build_requires 'Test::More';
 build_requires 'DBIx::Class';
 build_requires 'Config::Any';

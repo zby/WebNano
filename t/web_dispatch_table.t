@@ -2,6 +2,7 @@ use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
 use lib 't/lib';
+use lib 'extensions/lib';
 use MyApp;
 use File::Copy;
 
