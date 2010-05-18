@@ -8,29 +8,34 @@ use Plack::Request;
 use Scalar::Util qw(blessed);
 use Class::XSAccessor { accessors => [ 'renderer' ], constructor => 'new' };
 
-sub get_handler {
+sub psgi_callback {
     my $self = shift;
 
     sub {
-        my $req = Plack::Request->new(shift);
-        my $c_class = ref($self) . '::Controller';
-        eval "require $c_class";
-        my $path = $req->path;
-        $path =~ s{^/}{};
-        my $out = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
-        if( blessed $out and $out->isa( 'Plack::Response' ) ){
-            return $out->finalize;
-        }
-        elsif( ref $out eq 'CODE' ){
-            return $out;
-        }
-        else{
-            my $res = $req->new_response(200);
-            $res->content_type('text/html');
-            $res->body( $out );
-            return $res->finalize;
-        }
+        my $req = Plack::Request->new( shift );
+        $self->handle( $req );
     };
+}
+
+sub handle {
+    my( $self, $req ) = @_;
+    my $c_class = ref($self) . '::Controller';
+    eval "require $c_class";
+    my $path = $req->path;
+    $path =~ s{^/}{};
+    my $out = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
+    if( blessed $out and $out->isa( 'Plack::Response' ) ){
+        return $out->finalize;
+    }
+    elsif( ref $out eq 'CODE' ){
+        return $out;
+    }
+    else{
+        my $res = $req->new_response(200);
+        $res->content_type('text/html');
+        $res->body( $out );
+        return $res->finalize;
+    }
 }
 
 1;
@@ -97,10 +102,15 @@ that the whole object lives in that scope.  This is the same as
 Tatsumaki handlers (and controllers in Rails, Django and probably
 other frameworks) - but different from Catalyst.
 
+=head2 Streamming
+
+WebNano does not have any features helping with streaming content, but it also
+does not create any obstacles in using the original PSGI streamming interface.
+See for example the streaming_action method in t/lib/MyApp/Controller.pm.
 
 =head1 ATTRIBUTES and METHODS
 
-=head2 get_handler
+=head2 psgi_callback
 
 This is a method which returns a subroutine reference suitable for PSGI.
 The returned subrourine ref is a closure over the application object.
