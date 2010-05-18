@@ -21,6 +21,9 @@ sub get_handler {
         if( blessed $out and $out->isa( 'Plack::Response' ) ){
             return $out->finalize;
         }
+        elsif( ref $out eq 'CODE' ){
+            return $out;
+        }
         else{
             my $res = $req->new_response(200);
             $res->content_type('text/html');
