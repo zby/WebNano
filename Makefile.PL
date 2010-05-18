@@ -6,7 +6,7 @@ author   q{Zbigniew Łukasiak <zby@cpan.org>};
 license  'perl';
 
 requires 'Class::XSAccessor';
-requires 'Plack::Request';
+requires 'Plack::Request' => 0.9937;
 requires 'Scalar::Util';
 requires 'Plack::Test';
 requires 'URI::Escape';

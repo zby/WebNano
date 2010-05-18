@@ -39,7 +39,7 @@ sub edit_action {
     my $req = $self->request;
     my $form = MyApp::Controller::Dvd::Form->new( 
         item   => $self->record,
-        params => $req->params, 
+        params => $req->parameters->as_hashref, 
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $res = $req->new_response();

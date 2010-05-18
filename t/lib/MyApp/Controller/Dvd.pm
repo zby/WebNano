@@ -18,7 +18,7 @@ sub create_action {
     my $req = $self->request;
 
     my $form = MyApp::Controller::Dvd::Form->new( 
-        params => $req->params, 
+        params => $req->parameters->as_hashref, 
         schema => $self->application->schema,
     );
     if( $req->method eq 'POST' && $form->process() ){

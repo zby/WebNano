@@ -57,7 +57,7 @@ sub create {
     my $form_class = $self->form_class;
     Class::MOP::load_class( $form_class );
     my $form = $form_class->new( 
-        params => $req->params, 
+        params => $req->parameters->as_hashref, 
         schema => $self->application->schema,
     );
     if( $req->method eq 'POST' && $form->process() ){
@@ -96,7 +96,7 @@ sub edit {
     Class::MOP::load_class( $form_class );
     my $form = $form_class->new( 
         item   => $record,
-        params => $req->params, 
+        params => $req->parameters->as_hashref, 
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $res = $req->new_response();
