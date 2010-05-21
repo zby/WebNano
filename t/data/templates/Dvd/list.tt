@@ -1,0 +1,26 @@
+<html>
+<body>
+<table>
+<tr>
+<th>name</td>
+<th>creation_date</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+[% FOREACH record IN items %]
+<tr>
+<td>
+[% record.name %]
+</td>
+<td>
+[% record.creation_date %]
+</td>
+<td><a href="[% self_url %]record/[% record.id %]/view">View</a></td>
+<td><a href="[% self_url %]record/[% record.id %]/edit">Edit</a></td>
+<td><a href="[% self_url %]record/[% record.id %]/delete">Delete</a></td>
+</tr>
+[% END %]
+</body>
+</html>
+

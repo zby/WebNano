@@ -1,0 +1,69 @@
+<html>
+<body>
+<table>
+<tr>
+<td>
+<strong>id</strong>
+</td>
+<td>
+[% record.id %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>name</strong>
+</td>
+<td>
+[% record.name %]
+</tr>
+<tr>
+<td>
+<strong>imdb_id</strong>
+</td>
+<td>
+[% record.imdb_id %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>owner</strong>
+</td>
+<td>
+[% record.owner %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>current_borrower</strong>
+</td>
+<td>
+[% record.current_borrower %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>creation_date</strong>
+</td>
+<td>
+[% record.creation_date %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>alter_date</strong>
+</td>
+<td>
+[% record.alter_date %]
+</td>
+</tr>
+<tr>
+<td>
+<strong>hour</strong>
+</td>
+<td>
+[% record.hour %]
+</td>
+</tr>
+</body>
+</html>
+

@@ -4,8 +4,15 @@ use HTTP::Request::Common;
 use lib 't/lib';
 use MyApp;
 use File::Copy;
+use WebNano::TTTRenderer;
 
 copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
+
+my $dt = WebNano::TTTRenderer->new( root => 't/data/templates' );
+my $rendered;
+$dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );
+ok( $rendered =~ /some_var: some value/, 'vars' );
+ok( $rendered =~ /^Some text/, 'Slurping template file' );
 
 test_psgi( 
     app => MyApp->new()->psgi_callback, 
@@ -15,10 +22,14 @@ test_psgi(
         like( $res->content, qr/This is the home page/ );
         $res = $cb->(GET "/mapped url");
         like( $res->content, qr/This is the mapped url page/ );
+
         $res = $cb->(GET "SubController/some_method");
         like( $res->content, qr/This is a method with _action postfix/ );
         $res = $cb->(GET "SubController/safe_method");
         like( $res->content, qr/This is the safe_method page/ );
+        $res = $cb->(GET "SubController/with_template");
+        like( $res->content, qr/This is a SubController page rendered with a template/ );
+
         $res = $cb->(GET "/there_is_no_such_page");
         is( $res->code, 404 , '404 for non existing controller' );
         $res = $cb->(GET "/ThisIsNotController/");

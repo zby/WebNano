@@ -5,11 +5,23 @@ package WebNano::Controller;
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
+use File::Spec::Functions qw/catfile catdir/;
 
 use Class::XSAccessor { 
     accessors => [ qw/ application request self_url url_map / ], 
     constructor => 'new' 
 };
+
+sub template_dir {
+    my ( $self ) = @_;
+    my $dir = ref $self;
+    my $prefix = ref $self->application;
+    $prefix .= '::Controller';
+    $dir =~ s/^$prefix//;
+    $dir =~ s/^:://;
+    $dir = catdir( split( /::/, $dir ) );
+    return $dir;
+}
 
 sub render {
     my ( $self, $template, $vars ) = @_;
@@ -17,7 +29,13 @@ sub render {
     my $t = $self->application->renderer;
     $vars ||= {};
     $vars->{self_url} = $self->self_url;
-    if( $t->process($template, $vars, \$out) ){
+    if( $t->render( 
+            template => $template,
+            search_path => $self->template_dir,
+            vars => $vars, 
+            output => \$out 
+        ) 
+    ){
         return $out;
     }
     die $t->error;

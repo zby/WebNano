@@ -3,8 +3,8 @@ use Moose;
 use MooseX::NonMoose;
 extends 'WebNano';
 use Config::Any;
-use Template;
 use MyApp::DBSchema;
+use WebNano::TTTRenderer;
 
 has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
@@ -25,7 +25,7 @@ has renderer => ( is => 'ro', lazy_build => 1 );
 sub _build_renderer {
     my $self = shift;
     my $config = $self->config->{renderer};
-    return Template->new( $config );
+    return WebNano::TTTRenderer->new( %$config );
 }
 
 sub get_config {
