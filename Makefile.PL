@@ -11,6 +11,7 @@ requires 'Scalar::Util';
 requires 'Plack::Test';
 requires 'URI::Escape';
 requires 'Try::Tiny';
+requires 'Template::Tiny';
 
 build_requires 'Moose';
 build_requires 'Any::Moose';
