@@ -12,7 +12,7 @@ use Class::XSAccessor {
     constructor => 'new' 
 };
 
-sub template_dir {
+sub my_dir {
     my ( $self ) = @_;
     my $dir = ref $self;
     my $prefix = ref $self->application;
@@ -23,6 +23,8 @@ sub template_dir {
     return $dir;
 }
 
+sub template_search_path { [] }
+
 sub render {
     my ( $self, $template, $vars ) = @_;
     my $out;
@@ -31,7 +33,7 @@ sub render {
     $vars->{self_url} = $self->self_url;
     if( $t->render( 
             template => $template,
-            search_path => $self->template_dir,
+            search_path => [ $self->my_dir, @{ $self->template_search_path } ],
             vars => $vars, 
             output => \$out 
         ) 

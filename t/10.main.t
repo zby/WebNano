@@ -30,6 +30,20 @@ test_psgi(
         $res = $cb->(GET "SubController/with_template");
         like( $res->content, qr/This is a SubController page rendered with a template/ );
 
+        $res = $cb->(GET "Product/some");
+        like( $res->content, qr/This is the example template for ControllerWithTemplates/ );
+        $res = $cb->(GET "Product/another");
+        like( $res->content, qr/This is template for Product/ );
+        $res = $cb->(GET "Product/third");
+        like( $res->content, qr/This is template for Product/ );
+
+        $res = $cb->(GET "Book/some");
+        like( $res->content, qr/This is the example template for ControllerWithTemplates/ );
+        $res = $cb->(GET "Book/another");
+        like( $res->content, qr/This is template for Product/ );
+        $res = $cb->(GET "Book/third");
+        like( $res->content, qr/This is template for Book/ );
+
         $res = $cb->(GET "/there_is_no_such_page");
         is( $res->code, 404 , '404 for non existing controller' );
         $res = $cb->(GET "/ThisIsNotController/");
