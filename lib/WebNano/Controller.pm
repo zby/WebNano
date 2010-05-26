@@ -5,12 +5,21 @@ package WebNano::Controller;
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
+use Plack::Response;
 use File::Spec::Functions qw/catfile catdir/;
 
 use Class::XSAccessor { 
-    accessors => [ qw/ application request self_url url_map / ], 
+    accessors => [ qw/ application env self_url url_map _request / ], 
     constructor => 'new' 
 };
+
+sub request { 
+    my $self = shift;
+    return $self->_request if defined $self->_request;
+    my $req = Plack::Request->new( $self->env );
+    $self->_request( $req );
+    return $req;
+}
 
 sub my_dir {
     my ( $self ) = @_;
@@ -97,12 +106,12 @@ sub handle {
         return $new_controller->handle(
             path => $new_path,  
             self_url => $new_self_url,
-            request => $args{request},
+            env => $args{env},
             application => $args{application}
         );
     }
     else{
-        my $res = $self->request->new_response(404);
+        my $res = Plack::Response->new(404);
         $res->content_type('text/plain');
         $res->body( 'No such page' );
         return $res;
@@ -146,7 +155,7 @@ a Plack::Response object.
 
 If there is no suitable method in the current class, child controller classes 
 are tried out (their name is mapped literally).  If there is found one that 
-matches the path part then it is instantiated with the current request
+matches the path part then it is instantiated with the current psgi env
 and it's handle method is called.
 
 =head1 METHODS
@@ -173,7 +182,7 @@ Finds the method to be called for a path and dispatches to it.
 
 =head2 url_map
 =head2 application
-=head2 request
+=head2 env
 =head2 self_url
 
 

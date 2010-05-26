@@ -4,7 +4,7 @@ use warnings;
 package WebNano;
 
 our $VERSION = '0.001';
-use Plack::Request;
+use Plack::Response;
 use Scalar::Util qw(blessed);
 use Class::XSAccessor { accessors => [ 'renderer' ], constructor => 'new' };
 
@@ -12,18 +12,17 @@ sub psgi_callback {
     my $self = shift;
 
     sub {
-        my $req = Plack::Request->new( shift );
-        $self->handle( $req );
+        $self->handle( shift );
     };
 }
 
 sub handle {
-    my( $self, $req ) = @_;
+    my( $self, $env ) = @_;
     my $c_class = ref($self) . '::Controller';
     eval "require $c_class";
-    my $path = $req->path;
+    my $path = $env->{PATH_INFO};
     $path =~ s{^/}{};
-    my $out = $c_class->handle( path => $path, application => $self, request => $req, self_url => '/' );
+    my $out = $c_class->handle( path => $path, application => $self, env => $env, self_url => '/' );
     if( blessed $out and $out->isa( 'Plack::Response' ) ){
         return $out->finalize;
     }
@@ -31,7 +30,7 @@ sub handle {
         return $out;
     }
     else{
-        my $res = $req->new_response(200);
+        my $res = Plack::Response->new(200);
         $res->content_type('text/html');
         $res->body( $out );
         return $res->finalize;

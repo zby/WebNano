@@ -44,7 +44,7 @@ sub record_action {
     return MyApp::Controller::Dvd::Record->handle( 
         path => $action,
         application => $self->application,
-        request => $self->request,
+        env => $self->env,
         self_url => $self->self_url . "record/$id/",
         record => $record,
     );
