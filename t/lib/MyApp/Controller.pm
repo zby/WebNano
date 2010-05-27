@@ -4,8 +4,6 @@ use Moose;
 use MooseX::NonMoose;
 extends 'WebNano::Controller';
 
-use AnyEvent;
-
 has 'url_map' => ( is => 'ro', default => sub { { 'mapped url' => 'mapped_url' } } );
 
 sub index_action {
