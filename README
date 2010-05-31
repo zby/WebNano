@@ -48,7 +48,7 @@ other frameworks) - but different from Catalyst.
 
 DEPENDENCIES
 
-The core of WebNano is based on Class::XSAttributes.
+The core of WebNano is based on Class::XSAccessor.
 Beside that there are only minimal dependencies for the core - but there are
 a couple of extensions illustrating how to implement different dispatching
 methods and also for testing I use FormHandler and DBIC - those would eventually go into
