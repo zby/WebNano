@@ -5,7 +5,6 @@ package WebNano::Controller;
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
-use Plack::Response;
 use File::Spec::Functions qw/catfile catdir/;
 
 use Class::XSAccessor { 
@@ -52,7 +51,7 @@ sub render {
     die $t->error;
 }
 
-sub controller_for {
+sub external_dispatch {
     my ( $self, $path ) = @_;
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
@@ -73,7 +72,12 @@ sub controller_for {
     };
     return if !$loaded;
     return if !$controller_class->isa( 'WebNano::Controller' );
-    return ( $controller_class, $new_path, $self->self_url . $path_part  . '/' );
+    return $controller_class->handle(
+        path => $new_path,  
+        self_url => $self->self_url . $path_part  . '/',
+        env => $self->env,
+        application => $self->application,
+    );
 }
 
 sub local_dispatch {
@@ -102,20 +106,7 @@ sub handle {
     my $self = $class->new( %args );
     my $out = $self->local_dispatch( $path );
     return $out if defined $out;
-    if( my ( $new_controller, $new_path, $new_self_url ) = $self->controller_for( $path ) ){
-        return $new_controller->handle(
-            path => $new_path,  
-            self_url => $new_self_url,
-            env => $args{env},
-            application => $args{application}
-        );
-    }
-    else{
-        my $res = Plack::Response->new(404);
-        $res->content_type('text/plain');
-        $res->body( 'No such page' );
-        return $res;
-    }
+    return $self->external_dispatch( $path );
 };
 
 1;
@@ -150,8 +141,8 @@ WebNano::Controller
 This is the WebNano base controller. It's handle method dispatches the request
 to appropriate action method.
 
-The action method should return a a string containing the HTML page or
-a Plack::Response object.
+The action method should return a string containing the HTML page, 
+a Plack::Response object or a code ref.
 
 If there is no suitable method in the current class, child controller classes 
 are tried out (their name is mapped literally).  If there is found one that 
@@ -164,7 +155,8 @@ and it's handle method is called.
 
 Dispatches the request to the action methods as described above.
 
-Returns a Plack::Response object or a string containing the HTML page.
+Should return a Plack::Response object, a string containing the HTML page, a code ref
+or undef (which is later interpreted as 404).
 
 =head2 controller_for
 

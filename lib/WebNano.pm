@@ -23,7 +23,13 @@ sub handle {
     my $path = $env->{PATH_INFO};
     $path =~ s{^/}{};
     my $out = $c_class->handle( path => $path, application => $self, env => $env, self_url => '/' );
-    if( blessed $out and $out->isa( 'Plack::Response' ) ){
+    if( not defined $out ){
+        my $res = Plack::Response->new(404);
+        $res->content_type('text/plain');
+        $res->body( 'No such page' );
+        return $res->finalize;
+    }
+    elsif( blessed $out and $out->isa( 'Plack::Response' ) ){
         return $out->finalize;
     }
     elsif( ref $out eq 'CODE' ){
