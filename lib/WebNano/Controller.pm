@@ -8,7 +8,7 @@ use Plack::Request;
 use File::Spec::Functions qw/catfile catdir/;
 
 use Class::XSAccessor { 
-    accessors => [ qw/ application env self_url url_map _request / ], 
+    accessors => [ qw/ application env self_path self_url url_map _request / ], 
     constructor => 'new' 
 };
 
@@ -20,17 +20,6 @@ sub request {
     return $req;
 }
 
-sub my_dir {
-    my ( $self ) = @_;
-    my $dir = ref $self;
-    my $prefix = ref $self->application;
-    $prefix .= '::Controller';
-    $dir =~ s/^$prefix//;
-    $dir =~ s/^:://;
-    $dir = catdir( split( /::/, $dir ) );
-    return $dir;
-}
-
 sub template_search_path { [] }
 
 sub render {
@@ -39,9 +28,12 @@ sub render {
     my $t = $self->application->renderer;
     $vars ||= {};
     $vars->{self_url} = $self->self_url;
+    #warn 'render in ' . ref($self) . ' with self_path: ' . $self->self_path;
+    my $path = $self->self_path;
+    $path =~ s{^/}{};
     if( $t->render( 
             template => $template,
-            search_path => [ $self->my_dir, @{ $self->template_search_path } ],
+            search_path => [ $path, @{ $self->template_search_path } ],
             vars => $vars, 
             output => \$out 
         ) 
@@ -56,25 +48,29 @@ sub external_dispatch {
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class = ref($self) . '::' . $path_part;
-    my $loaded;
-    try{
-        my $controller_file = $controller_class;
-        $controller_file =~ s{::}{/}g;
-        $controller_file .= '.pm';
-        require $controller_file;
-        $loaded = 1;
-    }
-    catch {
-        if( $_ !~ /Can't locate .*$path_part.pm in \@INC/ ){
-            die $_;
+    my $controller_class;
+    my @path = @{ $self->application->controller_search_path };
+    for my $base ( @path ){
+        $base =~ s{::}{/}g;
+        my $controller_file = "$base/Controller" . $self->self_path . "$path_part.pm";
+        try{
+            require $controller_file;
+            $controller_class = $controller_file;
+            $controller_class =~ s/.pm$//;
+            $controller_class =~ s{/}{::}g;
         }
-    };
-    return if !$loaded;
+        catch {
+            if( $_ !~ /Can't locate .*$path_part.pm in \@INC/ ){
+                die $_;
+            }
+        };
+    }
+    return if !$controller_class;
     return if !$controller_class->isa( 'WebNano::Controller' );
     return $controller_class->handle(
         path => $new_path,  
-        self_url => $self->self_url . $path_part  . '/',
+        self_url  => $self->self_url . $path_part . '/',
+        self_path => $self->self_path. $path_part . '/',
         env => $self->env,
         application => $self->application,
     );

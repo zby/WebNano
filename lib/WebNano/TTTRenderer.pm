@@ -26,17 +26,24 @@ sub render {
     if( !@search_path ){
         @search_path = ( '' );
     }
+    LOOP:
     for my $path ( @search_path ){
         my $to_check;
         if( !$self->root || File::Spec->file_name_is_absolute( $path ) ){
             $to_check = File::Spec->catfile( $path, $params{template} );
+            if( -f $to_check ){ 
+                $template = $to_check;
+                last LOOP;
+            }
         }
         else{
-            $to_check = File::Spec->catfile( $self->root, $path, $params{template} );
-        }
-        if( -f $to_check ){ 
-            $template = $to_check;
-            last;
+            for my $root ( _to_list( $self->root ) ){
+                $to_check = File::Spec->catfile( $root, $path, $params{template} );
+                if( -f $to_check ){ 
+                    $template = $to_check;
+                    last LOOP;
+                }
+            }
         }
     }
     die "Cannot find $params{template} in search path: @search_path" if !defined $template;

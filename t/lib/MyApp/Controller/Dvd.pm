@@ -46,6 +46,7 @@ sub record_action {
         application => $self->application,
         env => $self->env,
         self_url => $self->self_url . "record/$id/",
+        self_path => $self->self_path . '/Record',
         record => $record,
     );
 }

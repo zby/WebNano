@@ -2,20 +2,14 @@ use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
 use lib 't/lib';
-use MyApp;
+use SubClassApp;
 use File::Copy;
 use WebNano::TTTRenderer;
 
 copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
 
-my $dt = WebNano::TTTRenderer->new( root => 't/data/templates' );
-my $rendered;
-$dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );
-ok( $rendered =~ /some_var: some value/, 'vars' );
-ok( $rendered =~ /^Some text/, 'Slurping template file' );
-
 test_psgi( 
-    app => MyApp->new()->psgi_callback, 
+    app => SubClassApp->new()->psgi_callback, 
     client => sub {
         my $cb = shift;
         my $res = $cb->(GET "/");
@@ -33,7 +27,7 @@ test_psgi(
         $res = $cb->(GET "NestedController2/some_method");
         like( $res->content, qr/This is a method with _action postfix in MyApp::Controller::NestedController2/ );
         $res = $cb->(GET "NestedController2/with_template");
-        like( $res->content, qr/This is a MyApp::Controller::NestedController2 page rendered with a template/ );
+        like( $res->content, qr/This is a SubClassApp::Controller::NestedController2 page rendered with a template/ );
 
         $res = $cb->(GET "Product/some");
         like( $res->content, qr/This is the example template for ControllerWithTemplates/ );

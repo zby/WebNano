@@ -1,4 +1,4 @@
-package MyApp::Controller::SubController;
+package MyApp::Controller::NestedController;
 use Moose;
 use MooseX::NonMoose;
 
