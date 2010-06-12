@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 package WebNano::Controller;
+use base 'WebNano::FindController';
+
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
@@ -48,25 +50,8 @@ sub external_dispatch {
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class;
-    my @path = @{ $self->application->controller_search_path };
-    for my $base ( @path ){
-        $base =~ s{::}{/}g;
-        my $controller_file = "$base/Controller" . $self->self_path . "$path_part.pm";
-        try{
-            require $controller_file;
-            $controller_class = $controller_file;
-            $controller_class =~ s/.pm$//;
-            $controller_class =~ s{/}{::}g;
-        }
-        catch {
-            if( $_ !~ /Can't locate .*$path_part.pm in \@INC/ ){
-                die $_;
-            }
-        };
-    }
+    my $controller_class = $self->find_nested( $path_part );
     return if !$controller_class;
-    return if !$controller_class->isa( 'WebNano::Controller' );
     return $controller_class->handle(
         path => $new_path,  
         self_url  => $self->self_url . $path_part . '/',

@@ -3,6 +3,8 @@ use warnings;
 
 package WebNano;
 
+use base 'WebNano::FindController';
+
 our $VERSION = '0.001';
 use Plack::Response;
 use Scalar::Util qw(blessed);
@@ -19,31 +21,13 @@ sub psgi_callback {
 
 sub controller_search_path { [ ref(shift) ] };
 
-sub find_controller {
-    my ( $self, $path_part ) = @_;
-    my $controller_class;
-    my @path = @{ $self->controller_search_path };
-    for my $base ( @path ){
-        $controller_class = $base . '::' . $path_part;
-        try{
-            my $controller_file = $controller_class;
-            $controller_file =~ s{::}{/}g;
-            $controller_file .= '.pm';
-            require $controller_file;
-        }
-        catch {
-            if( $_ && $_ !~ /Can't locate .*$path_part.pm in \@INC/ ){
-                die $_;
-            }
-        };
-    }
-    return $controller_class;
-}
+sub self_path { '' };
+sub application { shift };
 
 sub handle {
     my( $self, $env ) = @_;
     my $path = $env->{PATH_INFO};
-    my $c_class = $self->find_controller( 'Controller' );
+    my $c_class = $self->find_nested( '' );
     $path =~ s{^/}{};
     my $out = $c_class->handle( 
         path => $path, 
