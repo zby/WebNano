@@ -50,7 +50,7 @@ sub external_dispatch {
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class = $self->find_nested( $path_part );
+    my $controller_class = $self->find_nested( $self->self_path . $path_part, $self->application->controller_search_path );
     return if !$controller_class;
     return $controller_class->handle(
         path => $new_path,  

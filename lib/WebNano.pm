@@ -21,13 +21,10 @@ sub psgi_callback {
 
 sub controller_search_path { [ ref(shift) ] };
 
-sub self_path { '' };
-sub application { shift };
-
 sub handle {
     my( $self, $env ) = @_;
     my $path = $env->{PATH_INFO};
-    my $c_class = $self->find_nested( '' );
+    my $c_class = $self->find_nested( '', $self->controller_search_path );
     $path =~ s{^/}{};
     my $out = $c_class->handle( 
         path => $path, 

@@ -25,6 +25,7 @@ build_requires 'Config::Any';
 build_requires 'Config::General';
 build_requires 'HTML::FormHandler';
 build_requires 'HTML::FormHandler::Model::DBIC';
+build_requires 'Template';
 
 auto_install;
 

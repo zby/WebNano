@@ -5,13 +5,13 @@ package WebNano::FindController;
 use Try::Tiny;
 
 sub find_nested {
-    my( $self, $sub_path ) = @_;
+    my( $self, $sub_path, $search_path ) = @_;
     $sub_path =~ s{::}{/};
     my $controller_class;
-    my @path = @{ $self->application->controller_search_path };
+    my @path = @$search_path;
     for my $base ( @path ){
         $base =~ s{::}{/}g;
-        my $controller_file = "$base/Controller" . $self->self_path . "$sub_path.pm";
+        my $controller_file = "$base/Controller$sub_path.pm";
         try{
             require $controller_file;
             $controller_class = $controller_file;
