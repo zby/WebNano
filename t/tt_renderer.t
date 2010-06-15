@@ -38,5 +38,12 @@ $out = '';
 $renderer->render( template => 'second_root1.tt', search_path => [ 'subdir1', 'subdir2' ], output => \$out );
 is( $out, "tt2/subdir2/second_root1.tt\n" );
 
+$renderer = WebNano::Renderer::TT->new( root => [ 't/data/tt1', 't/data/tt2' ], INCLUDE_PATH => 't/data/tt_globals' );
+$out = '';
+$renderer->render( template => 'include_global.tt', output => \$out );
+is( $out, "t/data/tt_globals/some_global.tt\n\n" );
+
+
+
 done_testing();
 
