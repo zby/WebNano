@@ -1,9 +1,10 @@
 WebNano version 0.001
 
-The design goal numer one here is to provide basic functionality that should cover most 
-of use cases and a easy way to override it and extend.
-The design goal number two is to delegate as much as possible to specialized
-CPAN modules with minimal hassle.  
+The main design goals of this project:
+* provide basic functionality that should cover most of use cases and an easy way to override it and extend
+* delegate as much as possible to specialized CPAN modules with minimal hassle
+
+On the more experimental side this library also tries to facilitate encapsulating code together with templates into web components.
 
 The main functionality is simple mapping (dispatching) of HTTP request paths into method
 calls as in the following example:
@@ -16,23 +17,19 @@ The name of the action subroutine needs to end with '_action' postfix or alterna
 the mapping of the last part of the path to the subroutine name can be provided with
 'url_map' which can be an array of sub names or a hash of mappings (like run_modes 
 in CGI::Application).
-
-The examples in 'extensions' show how one can extend this basic dispatching with
-other dispatching 'flavours': 
-
-WebDispatchTable shows how to create a DSL for dispatching (ala Dancer):
-
-    get '/some_address' => sub { 'This is some_address in web_dispatch table' };
-
-CodeAttributesForMeta shows how to add an 'Action' code attribute (ala Catalyst):
-
-    sub index : Action { 'This is the index page' }
-
-CRUD shows how to create an encapsulated CRUD controller code
-
 This mapping is done inside Controller code - so it can be easily overridden
 and extended on per directory basis.  This should allow one to create
 self-contained controllers that fully encapsulate some specialized functionality.
+
+The extensions directory contains packages for controllers:
+
+DSL shows how to create a DSL for dispatching (ala Dancer):
+
+    get '/some_address' => sub { 'This is some_address in web_dispatch table' };
+
+CRUD shows how to create an encapsulated CRUD controller code
+
+WebNano-Renderer-TT is a Template Toolkit based renderer for WebNano.
 
 CONTROLLER OBJECTS LIVE IN THE REQUEST SCOPE (NEW CONTROLLER PER REQUEST)
 
