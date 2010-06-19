@@ -6,8 +6,6 @@ use SubClassApp;
 use File::Copy;
 use WebNano::TTTRenderer;
 
-copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
-
 test_psgi( 
     app => SubClassApp->new()->psgi_callback, 
     client => sub {

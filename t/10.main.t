@@ -6,8 +6,6 @@ use MyApp;
 use File::Copy;
 use WebNano::TTTRenderer;
 
-copy('t/data/dvdzbr.db','t/tmp/dvdzbr.db') or die "Copy failed: $!";
-
 my $dt = WebNano::TTTRenderer->new( root => 't/data/templates' );
 my $rendered;
 $dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );

@@ -1,0 +1,39 @@
+
+#   Failed test at t/with_attributes.t line 12.
+#                   'Couldn't load class (WebNano::Controller::WithAttributes) because: Can't call method "isa" on an undefined value at /home/zby/local/lib/perl5/site_perl/5.10.1/MooseX/NonMoose.pm line 85.
+# BEGIN failed--compilation aborted at /home/zby/progs/WebNano/extensions/WebNano-Controller-WithAttributes/lib/WebNano/Controller/WithAttributes.pm line 3.
+# Compilation failed in require at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Class/MOP.pm line 114.
+#  at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Class/MOP.pm line 120
+# 	Class::MOP::__ANON__('Can\'t call method "isa" on an undefined value at /home/zby/l...') called at /home/zby/local/lib/perl5/site_perl/5.10.1/Try/Tiny.pm line 98
+# 	Try::Tiny::try('CODE(0x8df0990)', 'Try::Tiny::Catch=REF(0x9015e00)') called at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Class/MOP.pm line 125
+# 	Class::MOP::load_first_existing_class('WebNano::Controller::WithAttributes') called at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Class/MOP.pm line 137
+# 	Class::MOP::load_class('WebNano::Controller::WithAttributes', undef) called at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Moose/Meta/Class.pm line 286
+# 	Moose::Meta::Class::superclasses(undef, 'WebNano::Controller::WithAttributes') called at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Moose.pm line 53
+# 	Moose::extends('Class::MOP::Class::__ANON__::SERIAL::3=HASH(0x9010680)', 'WebNano::Controller::WithAttributes') called at /home/zby/local/lib/perl5/site_perl/5.10.1/i686-linux/Moose/Exporter.pm line 293
+# 	Moose::extends('WebNano::Controller::WithAttributes') called at t/lib/MyApp/Controller/WithAttributes.pm line 5
+# 	require MyApp/Controller/WithAttributes.pm called at /home/zby/progs/WebNano/lib//WebNano/FindController.pm line 16
+# 	WebNano::FindController::__ANON__() called at /home/zby/local/lib/perl5/site_perl/5.10.1/Try/Tiny.pm line 76
+# 	eval {...} called at /home/zby/local/lib/perl5/site_perl/5.10.1/Try/Tiny.pm line 67
+# 	Try::Tiny::try('CODE(0x8e834c0)', 'Try::Tiny::Catch=REF(0x8e8e1a8)') called at /home/zby/progs/WebNano/lib//WebNano/FindController.pm line 25
+# 	WebNano::FindController::find_nested('MyApp::Controller=HASH(0x8e8b9b8)', '/WithAttributes', 'ARRAY(0x8e83450)') called at /home/zby/progs/WebNano/lib//WebNano/Controller.pm line 53
+# 	WebNano::Controller::external_dispatch('MyApp::Controller=HASH(0x8e8b9b8)', 'WithAttributes') called at /home/zby/progs/WebNano/lib//WebNano/Controller.pm line 90
+# 	WebNano::Controller::handle('MyApp::Controller', 'path', 'WithAttributes', 'application', 'MyApp=HASH(0x8e14fe8)', 'env', 'HASH(0x8cefb00)', 'self_url', '/', ...) called at /home/zby/progs/WebNano/lib//WebNano.pm line 29
+# 	WebNano::handle('MyApp=HASH(0x8e14fe8)', 'HASH(0x8cefb00)') called at /home/zby/progs/WebNano/lib//WebNano.pm line 18
+# 	WebNano::__ANON__('HASH(0x8cefb00)') called at /home/zby/local/lib/perl5/site_perl/5.10.1/Plack/Test/MockHTTP.pm line 24
+# 	Plack::Test::MockHTTP::__ANON__() called at /home/zby/local/lib/perl5/site_perl/5.10.1/Try/Tiny.pm line 71
+# 	eval {...} called at /home/zby/local/lib/perl5/site_perl/5.10.1/Try/Tiny.pm line 67
+# 	Try::Tiny::try('CODE(0x8981150)', 'Try::Tiny::Catch=REF(0x8df9060)') called at /home/zby/local/lib/perl5/site_perl/5.10.1/Plack/Test/MockHTTP.pm line 27
+# 	Plack::Test::MockHTTP::__ANON__('HTTP::Request=HASH(0x8e31c10)') called at t/with_attributes.t line 11
+# 	main::__ANON__('CODE(0x8e152f8)') called at /home/zby/local/lib/perl5/site_perl/5.10.1/Plack/Test/MockHTTP.pm line 33
+# 	Plack::Test::MockHTTP::test_psgi('app', 'CODE(0x8e14ff8)', 'client', 'CODE(0x87e1688)') called at /home/zby/local/lib/perl5/site_perl/5.10.1/Plack/Test.pm line 17
+# 	Plack::Test::test_psgi('app', 'CODE(0x8e14ff8)', 'client', 'CODE(0x87e1688)') called at t/with_attributes.t line 16
+# Compilation failed in require at /home/zby/progs/WebNano/lib//WebNano/FindController.pm line 16.
+# '
+#     doesn't match '(?-xism:This is index)'
+
+#   Failed test at t/with_attributes.t line 14.
+#                   'Attempt to reload MyApp/Controller/WithAttributes.pm aborted.
+# Compilation failed in require at /home/zby/progs/WebNano/lib//WebNano/FindController.pm line 16.
+# '
+#     doesn't match '(?-xism:This is some_address)'
+# Looks like you failed 2 tests of 2.

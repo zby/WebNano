@@ -14,18 +14,9 @@ requires 'URI::Escape';
 requires 'Try::Tiny';
 requires 'Template::Tiny';
 
-build_requires 'Moose';
-build_requires 'Any::Moose';
-build_requires 'MooseX::NonMoose';
-build_requires 'MooseX::MethodAttributes';
-build_requires 'Class::MOP';
 build_requires 'Test::More';
-build_requires 'DBIx::Class';
 build_requires 'Config::Any';
 build_requires 'Config::General';
-build_requires 'HTML::FormHandler';
-build_requires 'HTML::FormHandler::Model::DBIC';
-build_requires 'Template';
 
 auto_install;
 
