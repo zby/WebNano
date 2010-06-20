@@ -1,5 +1,14 @@
+use warnings;
+use strict;
+
 use DvdDatabase;
+use Plack::Builder;
+
+
 my $app = DvdDatabase->new();
-$app->psgi_callback;
+builder {
+    enable 'Session';
+    $app->psgi_callback;
+}
 
 
