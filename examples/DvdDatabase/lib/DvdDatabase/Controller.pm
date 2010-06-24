@@ -18,5 +18,12 @@ sub session_check_action {
     return "Hello, you've been here for ". ( 1 + $session->{counter}++ ). "th time!";
 }
 
+sub user_action {
+    my $self = shift;
+    return "Current user is " . $self->env->{user}->username if $self->env->{user};
+    return "No user logged in";
+}
+
+
 1;
 

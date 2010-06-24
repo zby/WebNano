@@ -4,8 +4,7 @@ use strict;
 use warnings;
 
 use base 'DBIx::Class';
-
-__PACKAGE__->load_components("InflateColumn::DateTime", "UTF8Columns", "Core");
+__PACKAGE__->load_components('EncodedColumn', "InflateColumn::DateTime", "Core");
 __PACKAGE__->table("user");
 __PACKAGE__->add_columns(
   "id",
@@ -22,13 +21,14 @@ __PACKAGE__->add_columns(
     is_nullable => 1,
     size => 255,
   },
-  "password",
-  {
-    data_type => "VARCHAR",
-    default_value => "NULL",
-    is_nullable => 1,
-    size => 255,
-  },
+  'password' => {
+      data_type   => 'CHAR',
+      size        => 40 + 10,
+      encode_column => 1,
+      encode_class  => 'Digest',
+      encode_args   => {algorithm => 'SHA-1', format => 'hex', salt_length => 10},
+      encode_check_method => 'check_password',
+   },
   "name",
   {
     data_type => "VARCHAR",
@@ -62,6 +62,5 @@ __PACKAGE__->has_many(
 # You can replace this text with custom content, and it will be preserved on regeneration
 use overload '""' => sub {$_[0]->username}, fallback => 1;
 __PACKAGE__->many_to_many('roles', 'user_roles' => 'role');
-__PACKAGE__->utf8_columns(qw/id username password name/);
 
 1;

@@ -36,6 +36,27 @@ sub get_config {
     return $values[0];
 }
 
+around handle => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $env  = shift;
+    if( $env->{'psgix.session'}{user_id} ){
+        $env->{user} = $self->schema->resultset( 'User' )->find( $env->{'psgix.session'}{user_id} );
+    }
+    else{
+        my $req = Plack::Request->new( $env );
+        if( $req->param( 'login' ) && $req->param( 'password' ) ){
+            my $user = $self->schema->resultset( 'User' )->search( { username => $req->param( 'login' ) } )->first;
+            if( $user->check_password( $req->param( 'password' ) ) ){
+                $env->{user} = $user;
+                $env->{'psgix.session'}{user_id} = $user->id;
+            }
+        }
+    }
+    $self->$orig( $env, @_ );
+};
+
+
 1;
 
 __END__
