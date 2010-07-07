@@ -99,10 +99,13 @@ __END__
 WebNano::Controller 
 
 =head1 SYNOPSIS
+With Moose:
 
     package MyApp::Controller;
     
     use Moose;
+    use MooseX::NonMoose;
+
     extends 'WebNano::Controller';
     
     has '+url_map' => ( default => sub { { 'Mapped Url' => 'mapped_url' } } );

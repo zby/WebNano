@@ -1,10 +1,17 @@
+use strict;
+use warnings;
+
 package MyApp::Controller;
 
-use Moose;
-use MooseX::NonMoose;
-extends 'WebNano::Controller';
+use base 'WebNano::Controller';
 
-has 'url_map' => ( is => 'ro', default => sub { { 'mapped url' => 'mapped_url' } } );
+
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new( @_ );
+    $self->url_map( { 'mapped url' => 'mapped_url' } );
+    return $self;
+}
 
 sub index_action {
     my $self = shift;

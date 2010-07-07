@@ -19,7 +19,7 @@ sub find_nested {
             $controller_class =~ s{/}{::}g;
         }
         catch {
-            if( $_ !~ /Can't locate .*$sub_path.pm in \@INC/ ){
+            if( $_ !~ /Can't locate $controller_file in \@INC/ ){
                 die $_;
             }
         };

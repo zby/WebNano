@@ -1,31 +1,24 @@
+use strict;
+use warnings;
+
 package MyApp;
-use Moose;
-use MooseX::NonMoose;
-extends 'WebNano';
+use base 'WebNano';
+use Class::XSAccessor { accessors => [ 'config' ], };
 use Config::Any;
 use WebNano::TTTRenderer;
 
-has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
-
-sub _build_config {
-    my( $self ) = @_;
-    return $self->get_config( 't/data/app' );
-}
-
-has renderer => ( is => 'ro', lazy_build => 1 );
-sub _build_renderer {
-    my $self = shift;
-    my $config = $self->config->{renderer};
-    return WebNano::TTTRenderer->new( %$config );
-}
-
-sub get_config {
-    my( $self, $conf_file ) = @_; 
-    
-    my $cfg = Config::Any->load_stems({ stems => [ $conf_file ], use_ext => 1 }); 
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new( @_ );
+    my $cfg = Config::Any->load_stems({ stems => [ $self->config_file ], use_ext => 1 }); 
     my @values = values %{$cfg->[0]};
-    return $values[0];
+    my $config = $values[0];
+    $self->config( $config );
+    $self->renderer( WebNano::TTTRenderer->new( %{ $config->{renderer} } ) );
+    return $self;
 }
+
+sub config_file { 't/data/app' }
 
 1;
 

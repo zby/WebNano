@@ -1,10 +1,15 @@
+use strict;
+use warnings;
+
 package MyApp::Controller::NestedController;
-use Moose;
-use MooseX::NonMoose;
+use base 'WebNano::Controller';
 
-extends 'WebNano::Controller';
-
-has 'url_map' => ( is => 'ro', default => sub { [ 'safe_method' ] } );
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new( @_ );
+    $self->url_map( [ 'safe_method' ] );
+    return $self;
+}
 
 sub safe_method { 'This is the safe_method page' }
 
