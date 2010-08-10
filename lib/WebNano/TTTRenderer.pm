@@ -39,7 +39,6 @@ sub render {
         else{
             for my $root ( _to_list( $self->root ) ){
                 $to_check = File::Spec->catfile( $root, $path, $params{template} );
-                warn "checking $to_check";
                 if( -f $to_check ){ 
                     $template = $to_check;
                     last LOOP;
