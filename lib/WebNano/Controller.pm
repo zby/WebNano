@@ -33,16 +33,13 @@ sub render {
     #warn 'render in ' . ref($self) . ' with self_path: ' . $self->self_path;
     my $path = $self->self_path;
     $path =~ s{^/}{};
-    if( $t->render( 
+    $t->render( 
             template => $template,
             search_path => [ $path, @{ $self->template_search_path } ],
             vars => $vars, 
             output => \$out 
-        ) 
-    ){
-        return $out;
-    }
-    die $t->error;
+    );
+    return $out;
 }
 
 sub external_dispatch {

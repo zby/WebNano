@@ -47,7 +47,9 @@ sub render {
         }
     }
     $self->INCLUDE_PATH( \@path );
-    $self->_tt->process( $params{template}, $params{vars}, $params{output} );
+    my $tt = $self->_tt;
+    $tt->process( $params{template}, $params{vars}, $params{output} ) 
+        || die $tt->error();;
 }
 
 1;

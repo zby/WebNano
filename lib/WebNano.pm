@@ -26,6 +26,7 @@ sub handle {
     my $path = $env->{PATH_INFO};
     my $c_class = $self->find_nested( '', $self->controller_search_path );
     $path =~ s{^/}{};
+    die 'Cannot find root controller' if !$c_class;
     my $out = $c_class->handle( 
         path => $path, 
         application => $self, 
