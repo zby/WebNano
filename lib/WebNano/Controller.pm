@@ -30,6 +30,7 @@ sub render {
     my $t = $self->application->renderer;
     $vars ||= {};
     $vars->{self_url} = $self->self_url;
+    $vars->{c} = $self;
     #warn 'render in ' . ref($self) . ' with self_path: ' . $self->self_path;
     my $path = $self->self_path;
     $path =~ s{^/}{};
