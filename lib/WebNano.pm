@@ -8,7 +8,7 @@ use base 'WebNano::FindController';
 our $VERSION = '0.001';
 use Plack::Response;
 use Scalar::Util qw(blessed);
-use Class::XSAccessor { accessors => [ 'renderer' ], constructor => 'new' };
+use Object::Tiny::RW 'renderer';
 use Try::Tiny;
 
 sub psgi_callback {

@@ -5,7 +5,7 @@ all_from 'lib/WebNano.pm';
 author   q{Zbigniew Łukasiak <zby@cpan.org>};
 license  'perl';
 
-requires 'Class::XSAccessor';
+requires 'Object::Tiny::RW';
 requires 'Plack' => 0.9938;
 requires 'Plack::Request';
 requires 'Scalar::Util';

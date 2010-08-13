@@ -3,6 +3,7 @@ use warnings;
 
 package WebNano::FindController;
 use Try::Tiny;
+use Object::Tiny::RW;
 
 sub find_nested {
     my( $self, $sub_path, $search_path ) = @_;

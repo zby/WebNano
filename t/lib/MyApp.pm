@@ -3,7 +3,7 @@ use warnings;
 
 package MyApp;
 use base 'WebNano';
-use Class::XSAccessor { accessors => [ 'config' ], };
+use Object::Tiny::RW 'config';
 use Config::Any;
 use WebNano::TTTRenderer;
 

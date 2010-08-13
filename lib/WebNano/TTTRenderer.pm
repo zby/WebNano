@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Template::Tiny;
-use Class::XSAccessor { accessors => [ qw/ root _tt_tiny / ], constructor => 'new', };
+use Object::Tiny::RW qw/ root _tt_tiny /;
 use File::Spec;
 
 
