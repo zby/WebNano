@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Template::Tiny;
-use Class::XSAccessor { accessors => [ qw/ root _tt_tiny / ], constructor => 'new', };
+use Object::Tiny qw/ root _tt_tiny /;
 use File::Spec;
 
 
@@ -50,7 +50,7 @@ sub render {
     open my $fh, $template or die "Cannot read from $template: $!";
     my $string = do { local $/; <$fh> };
     if( !$self->_tt_tiny ){
-        $self->_tt_tiny( Template::Tiny->new() );
+        $self->{_tt_tiny} = Template::Tiny->new();
     }
     $self->_tt_tiny->process( \$string, $params{vars}, $params{output} );
 }

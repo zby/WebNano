@@ -2,15 +2,21 @@ use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
 use lib 't/lib';
-use MyApp;
 use File::Copy;
 use WebNano::TTTRenderer;
+
+use MyApp;
+use MyApp::Controller;
 
 my $dt = WebNano::TTTRenderer->new( root => 't/data/templates' );
 my $rendered;
 $dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );
 ok( $rendered =~ /some_var: some value/, 'vars' );
 ok( $rendered =~ /^Some text/, 'Slurping template file' );
+my $app = MyApp->new();
+ok( $app, 'App created' );
+my $c = MyApp::Controller->new();
+ok( $c, 'Controller creaed' );
 
 test_psgi( 
     app => MyApp->new()->psgi_callback, 

@@ -6,8 +6,7 @@ use base 'WebNano::Controller';
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new( @_ );
-    $self->url_map( [ 'safe_method' ] );
+    my $self  = $class->SUPER::new( @_, url_map => [ 'safe_method' ]  );
     return $self;
 }
 

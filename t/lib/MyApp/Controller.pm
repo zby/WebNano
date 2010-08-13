@@ -8,8 +8,9 @@ use base 'WebNano::Controller';
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new( @_ );
-    $self->url_map( { 'mapped url' => 'mapped_url' } );
+    my $self  = $class->SUPER::new( @_, 
+        url_map => { 'mapped url' => 'mapped_url' } 
+    );
     return $self;
 }
 
