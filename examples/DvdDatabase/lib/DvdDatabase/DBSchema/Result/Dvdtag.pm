@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components("InflateColumn::DateTime", "UTF8Columns", "Core");
+__PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("dvdtag");
 __PACKAGE__->add_columns(
   "dvd",
@@ -34,6 +34,5 @@ __PACKAGE__->belongs_to("tag", "DvdDatabase::DBSchema::Result::Tag", { id => "ta
 
 # You can replace this text with custom content, and it will be preserved on regeneration
 use overload '""' => sub {$_[0]->id}, fallback => 1;
-__PACKAGE__->utf8_columns(qw/dvd tag/);
 
 1;

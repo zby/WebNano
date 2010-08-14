@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components("InflateColumn::DateTime", "UTF8Columns", "Core");
+__PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("unicode_examples");
 __PACKAGE__->add_columns(
   "id",
@@ -48,6 +48,5 @@ __PACKAGE__->set_primary_key("id");
 
 # You can replace this text with custom content, and it will be preserved on regeneration
 use overload '""' => sub {$_[0]->language_name}, fallback => 1;
-__PACKAGE__->utf8_columns(qw/id iso_country_code language_name main_unicode_set example_text/);
 
 1;

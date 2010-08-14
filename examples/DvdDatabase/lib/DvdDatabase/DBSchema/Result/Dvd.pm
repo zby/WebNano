@@ -5,7 +5,7 @@ use warnings;
 
 use base 'DBIx::Class';
 
-__PACKAGE__->load_components("InflateColumn::DateTime", "UTF8Columns", "Core");
+__PACKAGE__->load_components("InflateColumn::DateTime", "Core");
 __PACKAGE__->table("dvd");
 __PACKAGE__->add_columns(
   "id",
@@ -86,6 +86,5 @@ __PACKAGE__->has_many(
 # You can replace this text with custom content, and it will be preserved on regeneration
 use overload '""' => sub {$_[0]->name}, fallback => 1;
 __PACKAGE__->many_to_many('tags', 'dvdtags' => 'tag');
-__PACKAGE__->utf8_columns(qw/id name imdb_id owner current_borrower creation_date alter_date hour/);
 
 1;
