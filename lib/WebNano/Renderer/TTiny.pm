@@ -1,4 +1,4 @@
-package WebNano::TTTRenderer;
+package WebNano::Renderer::TTiny;
 use strict;
 use warnings;
 

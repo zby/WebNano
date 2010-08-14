@@ -4,7 +4,7 @@ use HTTP::Request::Common;
 use lib 't/lib';
 use SubClassApp;
 use File::Copy;
-use WebNano::TTTRenderer;
+use WebNano::Renderer::TTiny;
 
 test_psgi( 
     app => SubClassApp->new()->psgi_callback, 

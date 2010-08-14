@@ -4,7 +4,7 @@ use MooseX::NonMoose;
 extends 'WebNano';
 use Config::Any;
 use DvdDatabase::DBSchema;
-use WebNano::TTTRenderer;
+use WebNano::Renderer::TTiny;
 
 has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
@@ -25,7 +25,7 @@ has renderer => ( is => 'ro', lazy_build => 1 );
 sub _build_renderer {
     my $self = shift;
     my $config = $self->config->{renderer};
-    return WebNano::TTTRenderer->new( %$config );
+    return WebNano::Renderer::TTiny->new( %$config );
 }
 
 sub get_config {

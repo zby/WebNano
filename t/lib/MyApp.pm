@@ -5,7 +5,7 @@ package MyApp;
 use base 'WebNano';
 use Object::Tiny::RW 'config';
 use Config::Any;
-use WebNano::TTTRenderer;
+use WebNano::Renderer::TTiny;
 
 sub new {
     my $class = shift;
@@ -14,7 +14,7 @@ sub new {
     my @values = values %{$cfg->[0]};
     my $config = $values[0];
     $self->config( $config );
-    $self->renderer( WebNano::TTTRenderer->new( %{ $config->{renderer} } ) );
+    $self->renderer( WebNano::Renderer::TTiny->new( %{ $config->{renderer} } ) );
     return $self;
 }
 

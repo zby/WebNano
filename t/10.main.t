@@ -4,9 +4,9 @@ use HTTP::Request::Common;
 use lib 't/lib';
 use MyApp;
 use File::Copy;
-use WebNano::TTTRenderer;
+use WebNano::Renderer::TTiny;
 
-my $dt = WebNano::TTTRenderer->new( root => 't/data/templates' );
+my $dt = WebNano::Renderer::TTiny->new( root => 't/data/templates' );
 my $rendered;
 $dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );
 ok( $rendered =~ /some_var: some value/, 'vars' );
