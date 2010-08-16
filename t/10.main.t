@@ -5,10 +5,11 @@ use lib 't/lib';
 use MyApp;
 use File::Copy;
 use WebNano::Renderer::TTiny;
+use WebNano::Controller;
 
+my $c = WebNano::Controller->new( self_path => '', template_search_path => [] );
 my $dt = WebNano::Renderer::TTiny->new( root => 't/data/templates' );
-my $rendered;
-$dt->render( template => 'dummy_template', vars => { some_var => 'some value' }, output => \$rendered );
+my $rendered = $dt->render( $c, 'dummy_template', { some_var => 'some value' } );
 ok( $rendered =~ /some_var: some value/, 'vars' );
 ok( $rendered =~ /^Some text/, 'Slurping template file' );
 

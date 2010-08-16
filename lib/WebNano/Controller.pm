@@ -26,21 +26,7 @@ sub template_search_path { [] }
 
 sub render {
     my ( $self, $template, $vars ) = @_;
-    my $out;
-    my $t = $self->application->renderer;
-    $vars ||= {};
-    $vars->{self_url} = $self->self_url;
-    $vars->{c} = $self;
-    #warn 'render in ' . ref($self) . ' with self_path: ' . $self->self_path;
-    my $path = $self->self_path;
-    $path =~ s{^/}{};
-    $t->render( 
-            template => $template,
-            search_path => [ $path, @{ $self->template_search_path } ],
-            vars => $vars, 
-            output => \$out 
-    );
-    return $out;
+    return $self->application->renderer->render( $self, $template, $vars );
 }
 
 sub external_dispatch {

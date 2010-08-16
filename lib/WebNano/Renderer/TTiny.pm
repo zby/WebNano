@@ -20,39 +20,47 @@ sub _to_list {
 }
 
 sub render {
-    my( $self, %params ) = @_;
-    my $template;
-    my @search_path = _to_list( $params{search_path} );
+    my( $self, $c, $template, $vars ) = @_;
+    $vars ||= {};
+    $vars->{self_url} = $c->self_url;
+    $vars->{c} = $c;
+
+    my $path = $c->self_path;
+    $path =~ s{^/}{};
+    my @search_path = ( $path, @{ $c->template_search_path });
     if( !@search_path ){
         @search_path = ( '' );
     }
+    my $full_template;
     LOOP:
     for my $path ( @search_path ){
         my $to_check;
         if( !$self->root || File::Spec->file_name_is_absolute( $path ) ){
-            $to_check = File::Spec->catfile( $path, $params{template} );
+            $to_check = File::Spec->catfile( $path, $template );
             if( -f $to_check ){ 
-                $template = $to_check;
+                $full_template = $to_check;
                 last LOOP;
             }
         }
         else{
             for my $root ( _to_list( $self->root ) ){
-                $to_check = File::Spec->catfile( $root, $path, $params{template} );
+                $to_check = File::Spec->catfile( $root, $path, $template );
                 if( -f $to_check ){ 
-                    $template = $to_check;
+                    $full_template = $to_check;
                     last LOOP;
                 }
             }
         }
     }
-    die "Cannot find $params{template} in search path: @search_path" if !defined $template;
-    open my $fh, $template or die "Cannot read from $template: $!";
+    die "Cannot find $template in search path: @search_path" if !defined $full_template;
+    open my $fh, $full_template or die "Cannot read from $full_template: $!";
     my $string = do { local $/; <$fh> };
     if( !$self->_tt_tiny ){
         $self->_tt_tiny( Template::Tiny->new() );
     }
-    $self->_tt_tiny->process( \$string, $params{vars}, $params{output} );
+    my $out;
+    $self->_tt_tiny->process( \$string, $vars, \$out );
+    return $out;
 }
 
 1;
