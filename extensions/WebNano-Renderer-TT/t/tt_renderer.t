@@ -13,6 +13,16 @@ use WebNano::Renderer::TT;
 {
     package MyApp::Controller::subdir2;
     use base 'WebNano::Controller';
+    
+    sub some_action {
+        my( $self, $renderer ) = @_;
+        return $self->render( $renderer );
+    }
+
+    sub render {
+        my( $self, $renderer ) = @_;
+        return $renderer->render( c => $self );
+    }
 }
 
 my $renderer = WebNano::Renderer::TT->new( root => [ 't/data/tt2' ] );
@@ -49,7 +59,10 @@ $renderer = WebNano::Renderer::TT->new( root => [ 't/data/tt1', 't/data/tt2' ], 
 $out = $renderer->render( template => 'include_global.tt' );
 is( $out, "t/data/tt_globals/some_global.tt\n\n" );
 
-
+is(
+    MyApp::Controller::subdir2->new()->some_action( $renderer ),
+    "This is 'some' template in 't/data/tt1/subdir2'\n"
+);
 
 done_testing();
 

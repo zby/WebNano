@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Template;
-use Object::Tiny::RW qw/ root _tt global_path INCLUDE_PATH /;
+use Object::Tiny::RW qw/ root _tt global_path INCLUDE_PATH TEMPLATE_EXTENSION/;
 use File::Spec;
 
 sub new {
@@ -53,9 +53,17 @@ sub render {
         }
     }
     $self->INCLUDE_PATH( \@path );
+    my $template = $params{template};
+    if( !$template ){
+        my @caller = caller(2);
+        $template =  $caller[3];
+        $template =~ s/_action$//;
+        $template =~ s/^.*:://;
+        $template .= '.' . $self->TEMPLATE_EXTENSION if $self->TEMPLATE_EXTENSION;
+    }
     my $tt = $self->_tt;
     my $output;
-    $tt->process( $params{template}, \%params, \$output ) 
+    $tt->process( $template, \%params, \$output ) 
         || die $tt->error();
     return $output;
 }
