@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Template;
-use Class::XSAccessor { accessors => [ qw/ root _tt global_path INCLUDE_PATH / ], };
+use Object::Tiny::RW qw/ root _tt global_path INCLUDE_PATH /;
 use File::Spec;
 
 sub new {

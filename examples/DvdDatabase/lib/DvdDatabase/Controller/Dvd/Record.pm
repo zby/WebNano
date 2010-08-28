@@ -5,7 +5,7 @@ package DvdDatabase::Controller::Dvd::Record;
 
 use base 'WebNano::Controller';
 
-use Class::XSAccessor { accessors => [ qw/ record / ], };
+use Object::Tiny::RW  'record';
 
 
 sub index_action {

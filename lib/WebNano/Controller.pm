@@ -9,10 +9,7 @@ use URI::Escape 'uri_unescape';
 use Plack::Request;
 use File::Spec::Functions qw/catfile catdir/;
 
-use Class::XSAccessor { 
-    accessors => [ qw/ application env self_path self_url url_map _request / ], 
-    constructor => 'new' 
-};
+use Object::Tiny::RW  qw/ application env self_path self_url url_map _request /;
 
 sub request { 
     my $self = shift;
