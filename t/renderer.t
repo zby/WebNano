@@ -10,6 +10,16 @@ use WebNano::Controller;
     package WebNano::Controller::Book;
     use base 'WebNano::Controller';
     sub template_search_path { [ 'Product' ] }
+
+    sub some_action {
+        my( $self, $renderer ) = @_;
+        return $self->render( $renderer );
+    }
+
+    sub render {
+        my( $self, $renderer ) = @_;
+        return $renderer->render( c => $self );
+    }
 }
 
 my $c = WebNano::Controller->new();
@@ -30,5 +40,8 @@ like(
     qr/This is template for Book/ 
 );
 
-
+like( 
+    $c->some_action( $renderer ),
+    qr{This is 'some' template in 't/data/templates/Book'}
+);
 done_testing();

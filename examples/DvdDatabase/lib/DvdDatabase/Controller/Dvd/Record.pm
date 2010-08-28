@@ -17,14 +17,14 @@ sub index_action {
 sub view_action {
     my ( $self ) = @_;
 
-    return $self->render( 'record.tt', { record => $self->record } );
+    return $self->render( template => 'record.tt', record => $self->record );
 }
 
 sub delete_action {
     my ( $self ) = @_;
     my $record = $self->record;
     if( $self->request->method eq 'GET' ){
-        return $self->render( 'delete.tt', { record => $record } );
+        return $self->render( record => $record );
     }
     else{
         $record->delete;
@@ -47,7 +47,7 @@ sub edit_action {
         return $res;
     }
     $form->field( 'submit' )->value( 'Update' );
-    return $self->render( 'edit.tt', { form => $form->render } );
+    return $self->render( form => $form->render );
 }
 
 1;

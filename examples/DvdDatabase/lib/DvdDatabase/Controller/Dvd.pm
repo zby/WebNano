@@ -10,7 +10,7 @@ use DvdDatabase::Controller::Dvd::Record;
 sub index_action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( 'Dvd' );
-    return $self->render( 'list.tt', { items => [ $rs->search ] } );
+    return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create_action {
@@ -28,7 +28,7 @@ sub create_action {
         return $res;
     }
     $form->field( 'submit' )->value( 'Create' );
-    return $self->render( 'edit.tt', { form => $form->render } );
+    return $self->render( template => 'edit.tt', form => $form->render );
 }
 
 sub record_action {
@@ -46,7 +46,6 @@ sub record_action {
         application => $self->application,
         env => $self->env,
         self_url => $self->self_url . "record/$id/",
-        self_path => $self->self_path . '/Record',
         record => $record,
     );
 }
