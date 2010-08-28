@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 use Test::More;
 use Plack::Test;
 use HTTP::Request::Common;
@@ -8,8 +11,8 @@ use WebNano::Renderer::TTiny;
 use WebNano::Controller;
 
 my $c = WebNano::Controller->new( self_path => '', template_search_path => [] );
-my $dt = WebNano::Renderer::TTiny->new( root => 't/data/templates' );
-my $rendered = $dt->render( $c, 'dummy_template', { some_var => 'some value' } );
+my $renderer = WebNano::Renderer::TTiny->new( root => 't/data/templates', application => WebNano->new() );
+my $rendered = $renderer->render( c => $c, template => 'dummy_template', some_var => 'some value' );
 ok( $rendered =~ /some_var: some value/, 'vars' );
 ok( $rendered =~ /^Some text/, 'Slurping template file' );
 

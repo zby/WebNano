@@ -25,8 +25,8 @@ sub request {
 sub template_search_path { [] }
 
 sub render {
-    my ( $self, $template, $vars ) = @_;
-    return $self->application->renderer->render( $self, $template, $vars );
+    my $self = shift;
+    return $self->application->renderer->render( c => $self, @_ );
 }
 
 sub external_dispatch {

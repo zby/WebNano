@@ -35,8 +35,12 @@ sub _to_list {
 
 sub render {
     my( $self, %params ) = @_;
-    my $template;
-    my @input_path = _to_list( $params{search_path} );
+    my $c = $params{c};
+    my @input_path;
+    if( $c ){
+        @input_path = $c->self_path;
+        push @input_path, @{ $c->template_search_path } if $c->template_search_path;
+    }
     if( !@input_path ){
         @input_path = ( '' );
     }
@@ -48,8 +52,10 @@ sub render {
     }
     $self->INCLUDE_PATH( \@path );
     my $tt = $self->_tt;
-    $tt->process( $params{template}, $params{vars}, $params{output} ) 
-        || die $tt->error();;
+    my $output;
+    $tt->process( $params{template}, \%params, \$output ) 
+        || die $tt->error();
+    return $output;
 }
 
 1;
