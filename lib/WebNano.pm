@@ -32,7 +32,6 @@ sub handle {
         application => $self, 
         env => $env, 
         self_url => '/', 
-        self_path => '/', 
     );
     if( not defined $out ){
         my $res = Plack::Response->new(404);

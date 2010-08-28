@@ -9,7 +9,7 @@ use URI::Escape 'uri_unescape';
 use Plack::Request;
 use File::Spec::Functions qw/catfile catdir/;
 
-use Object::Tiny::RW  qw/ application env self_path self_url url_map _request /;
+use Object::Tiny::RW  qw/ application env self_url url_map _request /;
 
 sub request { 
     my $self = shift;
@@ -26,6 +26,14 @@ sub render {
     return $self->application->renderer->render( c => $self, @_ );
 }
 
+sub self_path{
+    my $self = shift;
+    my $path = ref $self;
+    $path =~ s/.*::Controller(::)?//;
+    $path =~ s{::}{/};
+    return $path . '/';
+}
+
 sub external_dispatch {
     my ( $self, $path ) = @_;
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
@@ -36,7 +44,6 @@ sub external_dispatch {
     return $controller_class->handle(
         path => $new_path,  
         self_url  => $self->self_url . $path_part . '/',
-        self_path => $self->self_path. $path_part . '/',
         env => $self->env,
         application => $self->application,
     );

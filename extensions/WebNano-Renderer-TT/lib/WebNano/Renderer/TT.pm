@@ -38,8 +38,10 @@ sub render {
     my $c = $params{c};
     my @input_path;
     if( $c ){
-        @input_path = $c->self_path;
-        push @input_path, @{ $c->template_search_path } if $c->template_search_path;
+        my $path = ref $c;
+        $path =~ s/.*::Controller(::)?//;
+        $path =~ s{::}{/};
+        @input_path = ( $path, @{ $c->template_search_path }); 
     }
     if( !@input_path ){
         @input_path = ( '' );

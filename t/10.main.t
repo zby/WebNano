@@ -10,12 +10,6 @@ use File::Copy;
 use WebNano::Renderer::TTiny;
 use WebNano::Controller;
 
-my $c = WebNano::Controller->new( self_path => '', template_search_path => [] );
-my $renderer = WebNano::Renderer::TTiny->new( root => 't/data/templates', application => WebNano->new() );
-my $rendered = $renderer->render( c => $c, template => 'dummy_template', some_var => 'some value' );
-ok( $rendered =~ /some_var: some value/, 'vars' );
-ok( $rendered =~ /^Some text/, 'Slurping template file' );
-
 test_psgi( 
     app => MyApp->new()->psgi_callback, 
     client => sub {
