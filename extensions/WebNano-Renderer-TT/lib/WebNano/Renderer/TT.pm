@@ -11,6 +11,7 @@ sub new {
     my $self = bless { 
         global_path => [ _to_list( delete $args{INCLUDE_PATH} ) ],
         root => delete $args{root},
+        TEMPLATE_EXTENSION => delete $args{TEMPLATE_EXTENSION},
     }, $class;
     # Use a weakend copy of self so we dont have loops preventing GC from working
     my $copy = $self;
