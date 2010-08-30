@@ -29,7 +29,7 @@ sub render {
 sub self_path{
     my $self = shift;
     my $path = ref $self;
-    $path =~ s/.*::Controller(::)?//;
+    $path =~ s/.*::Controller(?=(::|$))//;
     $path =~ s{::}{/};
     return $path . '/';
 }

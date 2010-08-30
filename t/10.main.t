@@ -54,6 +54,9 @@ test_psgi(
 #        $res = $cb->(GET "/DoesNotCompile/");
 #        is( $res->code, 500, '500 for controller that does not compile' );
 #        in some circumstances the above code dies instead of issuing a 500
+
+        $res = $cb->(GET "Deep/Nested/some");
+        is( $res->content, "This is 'some_action' in 'MyApp::Controller::Deep::Nested'" );
      } 
 );
 
