@@ -10,6 +10,7 @@ use Plack::Response;
 use Scalar::Util qw(blessed);
 use Object::Tiny::RW 'renderer';
 use Try::Tiny;
+use Encode;
 
 sub psgi_callback {
     my $self = shift;
@@ -48,7 +49,7 @@ sub handle {
     else{
         my $res = Plack::Response->new(200);
         $res->content_type('text/html');
-        $res->body( $out );
+        $res->body( encode( 'utf8', $out ) );
         return $res->finalize;
     }
 }

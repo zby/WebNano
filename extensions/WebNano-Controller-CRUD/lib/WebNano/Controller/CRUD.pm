@@ -22,9 +22,9 @@ has class_actions => (
 );
 
 around 'local_dispatch' => sub {
-    my( $orig, $self, $path) = @_;
-    my( $path_part, $method, @args ) = split qr{/}, $path;
+    my( $orig, $self, $path_part, $method, @args ) = @_;
     $method ||= 'view';
+    warn "$path_part, $method, @args";
     if( $path_part && $path_part =~ /^\d+$/ && $self->record_actions->{ $method } ){
         my $id = $path_part;
         my $rs = $self->application->schema->resultset( 'Dvd' );
@@ -40,14 +40,14 @@ around 'local_dispatch' => sub {
     if( defined $path_part && $self->class_actions->{$path_part} ){
         return $self->$path_part( $method, @args );
     }
-    return $self->$orig( $path );
+    return $self->$orig( $path_part, $method, @args );
 };
 
 
 sub list {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( $self->rs_name );
-    return $self->render( 'list.tt', { items => [ $rs->search ] } );
+    return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create {
@@ -67,19 +67,19 @@ sub create {
         return $res;
     }
     $form->field( 'submit' )->value( 'Create' );
-    return $self->render( 'edit.tt', { form => $form->render } );
+    return $self->render( template => 'edit.tt', form => $form->render );
 }
 
 sub view {
     my ( $self, $record ) = @_;
 
-    return $self->render( 'record.tt', { record => $record } );
+    return $self->render( template => 'record.tt', record => $record );
 }
 
 sub delete {
     my ( $self, $record ) = @_;
     if( $self->request->method eq 'GET' ){
-        return $self->render( 'delete.tt', { record => $record } );
+        return $self->render( template => 'delete.tt', record => $record );
     }
     else{
         $record->delete;
@@ -104,7 +104,7 @@ sub edit {
         return $res;
     }
     $form->field( 'submit' )->value( 'Update' );
-    return $self->render( 'edit.tt', { form => $form->render } );
+    return $self->render( template => 'edit.tt', form => $form->render );
 }
 
 1;
