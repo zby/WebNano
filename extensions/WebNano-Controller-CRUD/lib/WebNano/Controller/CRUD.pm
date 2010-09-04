@@ -49,7 +49,7 @@ around 'local_dispatch' => sub {
     my( $orig, $self, $path, @args ) = @_;
     my $parsed = $self->parse_path( $path );
     if( $parsed ){
-        my $rs = $self->application->schema->resultset( 'Dvd' );
+        my $rs = $self->application->schema->resultset( $self->rs_name );
         my $record = $rs->find( @{ $parsed->{ids} } );
         if( ! $record ) {
             my $res = $self->request->new_response(404);
