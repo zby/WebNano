@@ -24,7 +24,6 @@ has class_actions => (
 around 'local_dispatch' => sub {
     my( $orig, $self, $path_part, $method, @args ) = @_;
     $method ||= 'view';
-    warn "$path_part, $method, @args";
     if( $path_part && $path_part =~ /^\d+$/ && $self->record_actions->{ $method } ){
         my $id = $path_part;
         my $rs = $self->application->schema->resultset( 'Dvd' );

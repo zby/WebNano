@@ -1,4 +1,4 @@
-package DvdDatabase::Controller::DvdSimpleUrl;
+package DvdDatabase::Controller::Dvd2;
 use Moose;
 use MooseX::NonMoose;
 
@@ -6,17 +6,10 @@ extends 'WebNano::Controller';
 
 use DvdDatabase::Controller::Dvd::Form;
 
-has record_methods => ( 
-    is => 'ro', 
-    isa => 'HashRef', 
-    default => sub { { view => 1, 'delete' => 1, edit => 1 } }
-);
-
 around 'local_dispatch' => sub {
-    my( $orig, $self, $path) = @_;
-    my( $id, $method, @args ) = split qr{/}, $path;
-    $method ||= 'view';
-    if( $id && $id =~ /^\d+$/ && $self->record_methods->{ $method } ){
+    my( $orig, $self, $path, @args ) = @_;
+    if( $path =~ s{^record/(\d+)/}{} ){
+        my $id = $1;
         my $rs = $self->application->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
         if( ! $record ) {
@@ -25,9 +18,15 @@ around 'local_dispatch' => sub {
             $res->body( 'No record with id: ' . $id );
             return $res;
         }
-        return $self->$method( $record, @args );
+        unshift @args, $record;
     }
-    return $self->$orig( $path );
+    if( $path =~ m{^(view|edit|delete)/} ){
+        my $res = $self->request->new_response(404);
+        $res->content_type('text/plain');
+        $res->body( 'No page found' );
+        return $res;
+    }
+    return $self->$orig( $path, @args );
 };
 
 sub index_action {
@@ -54,13 +53,13 @@ sub create_action {
     return $self->render( template => 'edit.tt', form => $form->render );
 }
 
-sub view {
+sub view_action {
     my ( $self, $record ) = @_;
 
     return $self->render( record => $record );
 }
 
-sub delete {
+sub delete_action {
     my ( $self, $record ) = @_;
     if( $self->request->method eq 'GET' ){
         return $self->render( record => $record );
@@ -73,7 +72,7 @@ sub delete {
     }
 }
 
-sub edit {
+sub edit_action {
     my ( $self, $record ) = @_;
     my $req = $self->request;
     my $form = DvdDatabase::Controller::Dvd::Form->new( 

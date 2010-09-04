@@ -1,0 +1,10 @@
+<html>
+<body>
+<form method="post">
+<fieldset class="widget_fieldset">
+<input class="submit" id="widget_ok" name="ok" type="submit" value="Delete ?" />
+</fieldset>
+</form>
+</body>
+</html>
+

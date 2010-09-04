@@ -50,7 +50,7 @@ sub external_dispatch {
 }
 
 sub local_dispatch {
-    my ( $self, $path ) = @_;
+    my ( $self, $path, @args ) = @_;
     my @parts = split /\//, $path;
     my $name = uri_unescape( shift @parts );
     $name = 'index' if !defined( $name ) || !length( $name );
@@ -66,7 +66,7 @@ sub local_dispatch {
     my $method = $name . '_action';
     $action = $self->can( $method ) if !$action;
     return if !$action;
-    return $action->( $self, @parts );
+    return $action->( $self, @args, @parts );
 }
 
 sub handle {

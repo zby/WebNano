@@ -3,14 +3,16 @@ use Moose;
 use MooseX::NonMoose;
 extends 'WebNano';
 use Config::Any;
-use DvdDatabase::DBSchema;
+use Plack::Request;
 use WebNano::Renderer::TTiny;
+
+use DvdDatabase::DBSchema;
 
 has config => ( is => 'ro', isa => 'HashRef', lazy_build => 1 );
 
 sub _build_config {
     my( $self ) = @_;
-    return $self->get_config( 't/data/app' );
+    return $self->get_config( 'app' );
 }
 
 has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
