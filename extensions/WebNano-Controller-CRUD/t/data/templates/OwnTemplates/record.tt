@@ -64,6 +64,8 @@
 [% record.hour %]
 </td>
 </tr>
+</table>
+This is t/data/templates/OwnTemplates/record.tt
 </body>
 </html>
 

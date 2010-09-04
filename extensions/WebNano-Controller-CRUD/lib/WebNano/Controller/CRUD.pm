@@ -2,10 +2,10 @@ package WebNano::Controller::CRUD;
 use Moose;
 use MooseX::NonMoose;
 use Class::MOP;
+use File::Spec::Functions 'catdir';
 
 extends 'WebNano::Controller';
 
-has record_controller_class => ( is => 'ro', isa => 'Str', required => 1, default => 'WebNano::Controller::CRUD::Record' );
 has form_class => ( is => 'ro', isa => 'Str', required => 1 );
 has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
 
@@ -14,6 +14,23 @@ has record_actions => (
     isa => 'HashRef', 
     default => sub { { view => 1, 'delete' => 1, edit => 1 } }
 );
+
+my $FULLPATH;
+BEGIN { use Cwd (); $FULLPATH = Cwd::abs_path(__FILE__) }
+
+sub template_search_path {
+    my $self = shift;
+    my $mydir = $FULLPATH;
+    $mydir =~ s/.pm$//;
+    return [ catdir( $mydir, 'templates' ) ];
+}
+
+sub columns {
+    my $self = shift;
+    my $source = $self->application->schema->source( $self->rs_name );
+    return [ $source->columns ];
+}
+
 
 sub parse_path {
     my( $self, $path ) = @_;

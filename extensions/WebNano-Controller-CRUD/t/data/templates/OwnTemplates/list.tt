@@ -21,6 +21,8 @@
 <td><a href="[% c.self_url %][% record.id %]/delete">Delete</a></td>
 </tr>
 [% END %]
+
+This is t/data/templates/OwnTemplates/list.tt
 </body>
 </html>
 

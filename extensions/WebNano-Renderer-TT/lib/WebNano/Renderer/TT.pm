@@ -50,7 +50,12 @@ sub render {
     my @path = @{ $self->global_path };
     for my $root( _to_list( $self->root ) ){
         for my $sub_path( @input_path ){
-            push @path, File::Spec->catdir( $root, $sub_path );
+            if( File::Spec->file_name_is_absolute( $sub_path ) ){
+                push @path, $sub_path;
+            }
+            else{
+                push @path, File::Spec->catdir( $root, $sub_path );
+            }
         }
     }
     $self->INCLUDE_PATH( \@path );
@@ -64,8 +69,10 @@ sub render {
     }
     my $tt = $self->_tt;
     my $output;
-    $tt->process( $template, \%params, \$output ) 
-        || die $tt->error();
+    if( ! $tt->process( $template, \%params, \$output ) ){
+        warn "Current INCLUDE_PATH: @path\n"; 
+        die $tt->error();
+    }
     return $output;
 }
 
