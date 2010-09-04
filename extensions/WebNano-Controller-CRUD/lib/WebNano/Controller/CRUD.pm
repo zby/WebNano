@@ -22,7 +22,8 @@ has class_actions => (
 );
 
 around 'local_dispatch' => sub {
-    my( $orig, $self, $path_part, $method, @args ) = @_;
+    my( $orig, $self, $path, @args ) = @_;
+    my( $path_part, $method, @new_args ) = split /\//, $path;
     $method ||= 'view';
     if( $path_part && $path_part =~ /^\d+$/ && $self->record_actions->{ $method } ){
         my $id = $path_part;
@@ -34,12 +35,12 @@ around 'local_dispatch' => sub {
             $res->body( 'No record with id: ' . $id );
             return $res;
         }
-        return $self->$method( $record, @args );
+        return $self->$method( $record, @new_args, @args );
     }
     if( defined $path_part && $self->class_actions->{$path_part} ){
-        return $self->$path_part( $method, @args );
+        return $self->$path_part( $method, @new_args, @args );
     }
-    return $self->$orig( $path_part, $method, @args );
+    return $self->$orig( $path, @args );
 };
 
 
