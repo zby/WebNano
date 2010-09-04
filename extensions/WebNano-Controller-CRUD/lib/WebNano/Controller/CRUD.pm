@@ -15,42 +15,45 @@ has record_actions => (
     default => sub { { view => 1, 'delete' => 1, edit => 1 } }
 );
 
-has class_actions => ( 
-    is => 'ro', 
-    isa => 'HashRef', 
-    default => sub { { list => 1, create => 1 } }
-);
+sub parse_path {
+    my( $self, $path ) = @_;
+    my $parsed;
+    my $method_reg = join '|', keys %{ $self->record_actions };
+    if( $path =~ s{^(\d+)/($method_reg|)($|/)}{} ){
+        $parsed->{ids} =  [ $1 ];
+        $parsed->{method} = $2 || 'view';
+        $parsed->{args} = [ split /\//, $path ];
+        return $parsed;
+    }
+    return;
+}
 
 around 'local_dispatch' => sub {
     my( $orig, $self, $path, @args ) = @_;
-    my( $path_part, $method, @new_args ) = split /\//, $path;
-    $method ||= 'view';
-    if( $path_part && $path_part =~ /^\d+$/ && $self->record_actions->{ $method } ){
-        my $id = $path_part;
+    my $parsed = $self->parse_path( $path );
+    if( $parsed ){
         my $rs = $self->application->schema->resultset( 'Dvd' );
-        my $record = $rs->find( $id );
+        my $record = $rs->find( @{ $parsed->{ids} } );
         if( ! $record ) {
             my $res = $self->request->new_response(404);
             $res->content_type('text/plain');
-            $res->body( 'No record with id: ' . $id );
+            $res->body( 'No record with ids: ' . join ' ', @{ $parsed->{ids} } );
             return $res;
         }
-        return $self->$method( $record, @new_args, @args );
-    }
-    if( defined $path_part && $self->class_actions->{$path_part} ){
-        return $self->$path_part( $method, @new_args, @args );
+        my $method = $parsed->{method};
+        return $self->$method( $record, @{ $parsed->{args} }, @args );
     }
     return $self->$orig( $path, @args );
 };
 
 
-sub list {
+sub list_action {
     my( $self ) = @_;
     my $rs = $self->application->schema->resultset( $self->rs_name );
     return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
-sub create {
+sub create_action {
     my ( $self ) = @_;
     my $req = $self->request;
 

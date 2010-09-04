@@ -8,7 +8,7 @@ has '+rs_name' => ( default => 'Dvd' );
 
 sub index_action {
     my $self = shift;
-    return $self->list;
+    return $self->list_action;
 }
 
 1;

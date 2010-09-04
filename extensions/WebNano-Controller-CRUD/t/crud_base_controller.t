@@ -22,6 +22,10 @@ test_psgi(
         ok( $res->is_redirect, 'Redirect after POST' );
         $res = $cb->(GET $res->header('Location'));
         like( $res->content, qr/A new dvd/ );
+        $res = $cb->(GET "/DvdWithBaseCRUD/view/5");
+        is( $res->code, 404 , '404 for view with no record' );
+        $res = $cb->(GET "/DvdWithBaseCRUD/555/view");
+        is( $res->code, 404 , '404 for view with no record' );
      } 
 );
 
