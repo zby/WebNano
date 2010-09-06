@@ -63,6 +63,7 @@ around 'local_dispatch' => sub {
     return $self->$orig( $path, @args );
 };
 
+sub index_action { shift->list_action( @_ ) }
 
 sub list_action {
     my( $self ) = @_;
