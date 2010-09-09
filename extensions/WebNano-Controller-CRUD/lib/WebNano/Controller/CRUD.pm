@@ -7,7 +7,13 @@ use File::Spec::Functions 'catdir';
 extends 'WebNano::Controller';
 
 has form_class => ( is => 'ro', isa => 'Str', required => 1 );
-has rs_name => ( is => 'ro', isa => 'Str', required => 1 );
+has rs_name => ( is => 'ro', isa => 'Str', lazy_build => 1, );
+sub _build_rs_name {
+    my $self = shift;
+    my $my_name = ref $self;
+    $my_name =~ /::(\w+)$/;
+    return $1;
+}
 
 has record_actions => ( 
     is => 'ro', 
