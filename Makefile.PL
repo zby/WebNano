@@ -15,8 +15,6 @@ requires 'Try::Tiny';
 requires 'Template::Tiny';
 
 build_requires 'Test::More';
-build_requires 'Config::Any';
-build_requires 'Config::General';
 
 auto_install;
 
