@@ -1,0 +1,26 @@
+<html>
+<body>
+<table>
+<tr>
+[% FOREACH col IN c.columns %]
+<th>[% col %]</td>
+[% END %]
+<td></td>
+<td></td>
+<td></td>
+</tr>
+[% FOREACH record IN items %]
+<tr>
+[% FOREACH col IN c.columns %]
+<td>
+[% record.$col %]
+</td>
+[% END %]
+<td><a href="[% c.self_url %][% record.id %]/view">View</a></td>
+<td><a href="[% c.self_url %][% record.id %]/edit">Edit</a></td>
+<td><a href="[% c.self_url %][% record.id %]/delete">Delete</a></td>
+</tr>
+[% END %]
+</body>
+</html>
+

@@ -1,0 +1,18 @@
+<html>
+<body>
+Fields.
+<table>
+[% FOREACH col IN c.columns %]
+<tr>
+<td>
+<strong>[% col %]</strong>
+</td>
+<td>
+[% record.$col %]
+</td>
+</tr>
+[% END %]
+</table>
+</body>
+</html>
+
