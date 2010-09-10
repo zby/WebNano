@@ -4,7 +4,7 @@ use Moose;
 extends 'WebNano::Controller::CRUD';
 
 has '+form_class' => ( default => 'MyApp::Controller::Form' );
-has '+rs_name' => ( default => 'Dvd' );
+sub _build_rs_name { 'Dvd' };
 
 sub index_action {
     my $self = shift;

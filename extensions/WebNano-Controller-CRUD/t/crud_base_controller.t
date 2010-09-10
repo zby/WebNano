@@ -17,6 +17,7 @@ for my $controller( qw/DvdWithBaseCRUD OwnTemplates/ ){
         app => MyApp->new()->psgi_callback, 
         client => sub {
             my $cb = shift;
+            my $res;
             $res = $cb->(GET "/$controller/");
             like( $res->content, qr/Jurassic Park II/ );
             $res = $cb->(POST "/$controller/5/edit", [ name => 'Not Jurassic Park' ] );
@@ -39,6 +40,7 @@ test_psgi(
     app => MyApp->new()->psgi_callback, 
     client => sub {
         my $cb = shift;
+        my $res;
         $res = $cb->(GET "/OwnTemplates/");
         like( $res->content, qr{This is t/data/templates/OwnTemplates/list.tt} );
         $res = $cb->(GET "/OwnTemplates/5/view");

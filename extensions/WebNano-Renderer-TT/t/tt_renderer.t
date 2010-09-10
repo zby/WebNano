@@ -42,19 +42,19 @@ is( $out, "tt2/second_root.tt\n" );
 my $c = MyApp::Controller::subdir1->new();
 $out = $renderer->render( c => $c, template => 'template.tt' );
 is( $out, "tt1/subdir1/template.tt\n" );
-my $c = MyApp::Controller::subdir2->new();
+$c = MyApp::Controller::subdir2->new();
 $out = $renderer->render( c => $c, template => 'template.tt' );
 is( $out, "tt1/subdir2/template.tt\n" );
-my $c = MyApp::Controller::subdir1->new();
+$c = MyApp::Controller::subdir1->new();
 $out = $renderer->render( c => $c, template => 'template1.tt' );
 is( $out, "tt1/subdir2/template1.tt\n" );
 
 $out = $renderer->render( c => $c, template => 'second_root.tt' );
 is( $out, "tt2/subdir1/second_root.tt\n" );
-my $c = MyApp::Controller::subdir2->new();
+$c = MyApp::Controller::subdir2->new();
 $out = $renderer->render( c => $c, template => 'second_root.tt' );
 is( $out, "tt2/subdir2/second_root.tt\n" );
-my $c = MyApp::Controller::subdir1->new();
+$c = MyApp::Controller::subdir1->new();
 $out = $renderer->render( c => $c, template => 'second_root1.tt' );
 is( $out, "tt2/subdir2/second_root1.tt\n" );
 
