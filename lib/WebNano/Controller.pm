@@ -26,7 +26,7 @@ sub render {
     return $self->application->renderer->render( c => $self, @_ );
 }
 
-sub self_path{
+sub _self_path{
     my $self = shift;
     my $path = ref $self;
     $path =~ s/.*::Controller(?=(::|$))//;
@@ -34,12 +34,12 @@ sub self_path{
     return $path . '/';
 }
 
-sub external_dispatch {
+sub _external_dispatch {
     my ( $self, $path ) = @_;
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class = $self->find_nested( $self->self_path . $path_part, $self->application->controller_search_path );
+    my $controller_class = $self->find_nested( $self->_self_path . $path_part, $self->application->controller_search_path );
     return if !$controller_class;
     return $controller_class->handle(
         path => $new_path,  
@@ -75,7 +75,7 @@ sub handle {
     my $self = $class->new( %args );
     my $out = $self->local_dispatch( $path );
     return $out if defined $out;
-    return $self->external_dispatch( $path );
+    return $self->_external_dispatch( $path );
 };
 
 1;
@@ -130,10 +130,6 @@ Dispatches the request to the action methods as described above.
 Should return a Plack::Response object, a string containing the HTML page, a code ref
 or undef (which is later interpreted as 404).
 
-=head2 controller_for
-
-Finds a next controller to forward to according to the path.
-
 =head2 render
 
 Renders a template.
@@ -141,6 +137,10 @@ Renders a template.
 =head2 local_dispatch
 
 Finds the method to be called for a path and dispatches to it.
+
+=head2 request
+
+=head2 template_search_path
 
 =head1 ATTRIBUTES
 

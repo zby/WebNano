@@ -88,3 +88,32 @@ sub render {
 
 1;
 
+__END__
+
+=head1 NAME
+
+WebNano::Renderer::TTiny - Template::Tiny renderer for WebNano
+
+=head1 SYNOPSIS
+
+see t/renderer.t
+
+=head1 ATTRIBUTES and METHODS
+
+=head2 render
+
+=head2 INCLUDE_PATH
+
+Global list of template search directories.
+
+=head2 root
+
+List of directories that are dynamically concatenated with controller names to form
+a dynamic search list of template directories.
+
+You can use INCLUDE_PATH or root or both.
+
+=head2 TEMPLATE_EXTENSION
+
+Postfix added to action name to form the template name ( for example 'edit.tt' from 'edit' + '.tt' ).
+

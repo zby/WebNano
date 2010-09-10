@@ -32,3 +32,7 @@ sub find_nested {
 
 1;
 
+__END__
+
+=head2 find_nested
+
