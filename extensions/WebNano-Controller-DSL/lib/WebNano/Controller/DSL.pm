@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package WebNano::Controller::DSL;
 
 use WebNano::Controller::Meta::Class::Trait::WebDispatchTable;

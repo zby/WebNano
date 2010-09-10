@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package WebNano::Controller::DSL::Moose;
 
 use Moose ();

@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package MyApp::Controller::Form;
 use HTML::FormHandler::Moose;
 extends 'HTML::FormHandler::Model::DBIC';

@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 package MyApp::Controller::DSL;
 
 use WebNano::Controller::DSL::Moose;

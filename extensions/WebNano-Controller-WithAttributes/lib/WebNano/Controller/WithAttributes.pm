@@ -1,5 +1,6 @@
 package WebNano::Controller::WithAttributes;
 use URI::Escape 'uri_unescape';
+use Moose;
 use MooseX::NonMoose;
 extends 'WebNano::Controller';
 
