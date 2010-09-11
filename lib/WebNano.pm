@@ -68,43 +68,101 @@ This document describes WebNano version 0.001
 
 =head1 SYNOPSIS
 
-See the example in t/lib/MyApp
+in MyApp.pm
+
+    package MyApp;
+    use base 'WebNano';
+    use WebNano::Renderer::TTiny;
+    
+    sub new { ... }
+
+
+in MyApp/Controller.pm
+
+    package MyApp::Controller;
+    
+    use base 'WebNano::Controller';
+    
+    sub index_action {
+        my $self = shift;
+        return 'This is my home';
+    }
+
+in app.psgi
+
+    use MyApp;
+    my $app = MyApp->new();
+    $app->psgi_callback;
+    
 
 =head1 DESCRIPTION
 
-The design goal numer one here is to provide basic functionality that should cover most 
-of use cases and a easy way to override it and extend.
-The design goal number two is to delegate as much as possible to specialized
-CPAN modules with minimal hassle.  
+A minimalistic WebNano application consists of three parts - the application
+class, at least one controller class and the standard Plack
+L<app.psgi|http://search.cpan.org/~miyagawa/Plack/scripts/plackup> file.
 
-The main functionality is simple mapping (dispatching) of HTTP request paths into method
-calls as in the following example:
+The application object is instantiated only once and is used to hold all the
+other constand data objects - like connection to the database, a template
+renderer object (if it is too heavy to be created per request) and generally
+stuff that is too heavy to be rebuild with each request.  In contrast the
+controller objects are recreated for each request a new.
 
-    '/' -> 'MyApp::Controller->index_action()'
+The dispatching implemented by WebNano is simple mapping of HTTP request paths into method
+calls as in the following examples:
+
     '/page' -> 'MyApp::Controller->page_action()'
     '/Some/Very/long/path' -> 'MyApp::Controller::Some::Very->long_action( 'path' )
 
-The name of the action subroutine needs to end with '_action' postfix or alternatively 
-the mapping of the last part of the path to the subroutine name can be provided with
-'url_map' which can be an array of sub names or a hash of mappings (like run_modes 
-in CGI::Application).
+Additionally if the path ends in '/' then 'index' is added to it - so '/' is
+mapped to 'index_action' and '/SomeController/' is mapped to
+MyApp::SomeController->index_action.
 
-The examples in 'extensions' show how one can extend this basic dispatching with
-other dispatching 'flavours': 
+If someone does not like the '_action' postfixes then he can use the
+'url_map' controller attribute which works like the 'run_modes' attribute in
+CGI::Application - that is provides a map for method dispatching:
 
-WebDispatchTable shows how to create a DSL for dispatching (ala Dancer):
+    $self->url_map( { 'mapped url' => 'mapped_url' } );
+
+or a list of approved methods to be dispached by name:
+
+    $self->url_map( [ 'safe_method' ] );
+
+More advanced dispatching is done by overriding the 'local_dispatch' method in
+the Controller class:
+
+    around 'local_dispatch' => sub {
+        my( $orig, $self, $path) = @_;
+        my( $id, $method, @args ) = split qr{/}, $path;
+        $method ||= 'view';
+        if( $id && $id =~ /^\d+$/ ){
+            my $rs = $self->application->schema->resultset( 'Dvd' );
+            my $record = $rs->find( $id );
+            if( ! $record ) {
+                my $res = $self->request->new_response(404);
+                $res->content_type('text/plain');
+                $res->body( 'No record with id: ' . $id );
+                return $res;
+            }
+            return $self->$method( $record, @args );
+        }
+        return $self->$orig( $path );
+    };
+    
+This one checks if the first part of the path is a number - if it is it uses
+it to look for a Dvd object by primary key.  If it cannot find such a Dvd then
+it returns a 404. If it finds that dvd it then redispatches by the next path
+part and passes that dvd object as the first parameter to that method call.
+
+The design goal numer one here is to provide basic functionality that should cover most 
+of use cases and a easy way to override it and extend. In general it is easy
+to write your own dispatcher that work for your limited use case - and here
+you just need to do that, you can override the dispatching only for a
+particular controller and you don't need to warry about the general cases.
+
+The example in extensions/WebNano-Controller-DSL/ shows how to create a DSL
+for dispatching (ala Dancer):
 
     get '/some_address' => sub { 'This is some_address in web_dispatch table' };
-
-CodeAttributesForMeta shows how to add an 'Action' code attribute (ala Catalyst):
-
-    sub index : Action { 'This is the index page' }
-
-CRUD shows how to create an encapsulated CRUD controller code
-
-This mapping is done inside Controller code - so it can be easily overridden
-and extended on per directory basis.  This should allow one to create
-self-contained controllers that fully encapsulate some specialized functionality.
 
 =head2 Controller object live in the request scope (new controller per request)
 
@@ -140,6 +198,10 @@ Application method that acts as the PSGI callback - takes environment
 as input and returns the response.
 
 =head2 renderer
+
+Nearly every web application uses some templating engine - this is the
+attribute to keep the templating engine object.  It is not mandatory that you
+follow this rule.
 
 =head1 DIAGNOSTICS
 

@@ -111,21 +111,22 @@ With Moose:
 =head1 DESCRIPTION
 
 This is the WebNano base controller. It's handle method dispatches the request
-to appropriate action method.
+to appropriate action method or to a next controller.
 
 The action method should return a string containing the HTML page, 
 a Plack::Response object or a code ref.
 
-If there is no suitable method in the current class, child controller classes 
-are tried out (their name is mapped literally).  If there is found one that 
-matches the path part then it is instantiated with the current psgi env
-and it's handle method is called.
+If there is no suitable method in the current class, child controller classes
+are tried out.  If there is found one that matches the path part then it is
+instantiated with the current psgi env and it's handle method is called.
 
 =head1 METHODS
 
 =head2 handle
 
-Dispatches the request to the action methods as described above.
+This is a class method - it receives the arguments, creates the controller
+object and then uses it's L<local_dispatch> method, if that fails it tries to
+find a suitable child controller class and forwards the request to it.
 
 Should return a Plack::Response object, a string containing the HTML page, a code ref
 or undef (which is later interpreted as 404).
@@ -136,7 +137,7 @@ Renders a template.
 
 =head2 local_dispatch
 
-Finds the method to be called for a path and dispatches to it.
+Finds the method to be called for a given path and dispatches to it.
 
 =head2 request
 
@@ -145,8 +146,17 @@ Finds the method to be called for a path and dispatches to it.
 =head1 ATTRIBUTES
 
 =head2 url_map
+
+A hash that is used as path part to method map.
+
 =head2 application
+
+Links back to the application object.
+
 =head2 env
+
+L<PSGI environment|http://search.cpan.org/~miyagawa/PSGI/PSGI.pod#The_Environment>
+
 =head2 self_url
 
 
