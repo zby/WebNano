@@ -58,13 +58,7 @@ sub handle {
 
 __END__
 
-=head1 NAME
-
-WebNano - A minimalistic PSGI based web framework
-
-=head1 VERSION
-
-This document describes WebNano version 0.001
+# ABSTRACT: A minimalistic PSGI based web framework.
 
 =head1 SYNOPSIS
 
@@ -240,11 +234,6 @@ No bugs have been reported.
 Please report any bugs or feature requests to
 C<bug-webnano@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
-
-
-=head1 AUTHOR
-
-Zbigniew Lukasiak  C<< <zby@cpan.org> >>
 
 
 

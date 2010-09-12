@@ -82,10 +82,6 @@ sub handle {
 
 __END__
 
-=head1 NAME
-
-WebNano::Controller 
-
 =head1 SYNOPSIS
 With Moose:
 

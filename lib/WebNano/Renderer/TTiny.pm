@@ -90,13 +90,55 @@ sub render {
 
 __END__
 
-=head1 NAME
-
-WebNano::Renderer::TTiny - Template::Tiny renderer for WebNano
+# ABSTRACT: Dynamic search paths for Template::Tiny
 
 =head1 SYNOPSIS
 
-see t/renderer.t
+in MyApp.pm: 
+
+    $self->renderer( 
+        WebNano::Renderer::TTiny->new( root => 't/data/templates' )
+    );
+    
+in MyApp::Controller:
+
+    return $self->render( template => 'some_template.tt', some_var => 'some_value );
+
+=head1 DESCRIPTION
+
+This is a wrapper around
+L<Template::Tiny|http://search.cpan.org/~adamk/Template-Tiny/lib/Template/Tiny.pm>
+- 'Template Toolkit reimplemented in as little code as possible'.
+
+The only public method here is render - it expects as input a hash with the
+following data:
+
+=over
+
+=item template - the name of the template file
+
+=item c - the controller
+
+=back
+
+The template is then looked for in the directories in C<INCLUDE_PATH> and in
+directories constructed dynamically from the paths in C<root> and the controller
+name.  For example if 'root' contains C<[ 'template', 'additional_templates' ]>
+and the controller name is C<MyApp::Controller::SubController> then the template
+will be looked for in C<template/SubController> and
+C<additional_templates/SubController>.  This mechanism is designed so that it is
+possible for a way of subclassing templates along with subclassing controllers.
+If this is too complicated - you can provide no value for the C<root> attribute
+and use only C<INCLUDE_PATH>.
+
+When the template is found - the C<process> method on the internal
+C<Template::Tiny> object is called.  A reference to the whole hash passed to
+C<render> is passed to the C<process> call - so that all the values are
+available in the template itself.
+
+If no template name is passed - then it is guessed from the name of the
+controller method that called C<render> (this is done using L<caller>) and the
+C<TEMPLATE_EXTENSION> attribute.
 
 =head1 ATTRIBUTES and METHODS
 
@@ -104,7 +146,7 @@ see t/renderer.t
 
 =head2 INCLUDE_PATH
 
-Global list of template search directories.
+Static list of template search directories.
 
 =head2 root
 
@@ -115,5 +157,6 @@ You can use INCLUDE_PATH or root or both.
 
 =head2 TEMPLATE_EXTENSION
 
-Postfix added to action name to form the template name ( for example 'edit.tt' from 'edit' + '.tt' ).
+Postfix added to action name to form the template name ( for example 'edit.tt'
+from action 'edit' and TEMPLATE_EXTENSION 'tt' ).
 
