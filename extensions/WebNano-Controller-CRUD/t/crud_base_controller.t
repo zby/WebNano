@@ -23,7 +23,8 @@ for my $controller( qw/DvdWithBaseCRUD OwnTemplates/ ){
             $res = $cb->(POST "/$controller/5/edit", [ name => 'Not Jurassic Park' ] );
             ok( $res->is_redirect, 'Redirect after POST' );
             $res = $cb->(GET $res->header('Location'));
-            like( $res->content, qr/Not Jurassic Park/ );
+            $res = $cb->(GET "/$controller/create" );
+            like( $res->content, qr/alter_date.year/ );
             $res = $cb->(POST "/$controller/create", [ name => 'A new dvd', owner => 1 ] );
             ok( $res->is_redirect, 'Redirect after POST' );
             $res = $cb->(GET $res->header('Location'));

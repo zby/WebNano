@@ -83,9 +83,11 @@ sub create_action {
 
     my $form_class = $self->form_class;
     Class::MOP::load_class( $form_class );
+    my $item = $self->application->schema->resultset( $self->rs_name )->new_result( {} );
     my $form = $form_class->new( 
         params => $req->parameters->as_hashref, 
         schema => $self->application->schema,
+        item   => $item,
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $record = $form->item;
