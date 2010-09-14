@@ -1,7 +1,0 @@
-<html>
-<body>
-[% form %]
-This is t/data/templates/OwnTemplates/edit.tt
-</body>
-</html>
-
