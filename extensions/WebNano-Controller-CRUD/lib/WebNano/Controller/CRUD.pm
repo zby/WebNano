@@ -33,7 +33,7 @@ sub template_search_path {
 
 sub columns {
     my $self = shift;
-    my $source = $self->application->schema->source( $self->rs_name );
+    my $source = $self->app->schema->source( $self->rs_name );
     return [ $source->columns ];
 }
 
@@ -55,10 +55,10 @@ around 'local_dispatch' => sub {
     my( $orig, $self, $path, @args ) = @_;
     my $parsed = $self->parse_path( $path );
     if( $parsed ){
-        my $rs = $self->application->schema->resultset( $self->rs_name );
+        my $rs = $self->app->schema->resultset( $self->rs_name );
         my $record = $rs->find( @{ $parsed->{ids} } );
         if( ! $record ) {
-            my $res = $self->request->new_response(404);
+            my $res = $self->req->new_response(404);
             $res->content_type('text/plain');
             $res->body( 'No record with ids: ' . join ' ', @{ $parsed->{ids} } );
             return $res;
@@ -73,20 +73,20 @@ sub index_action { shift->list_action( @_ ) }
 
 sub list_action {
     my( $self ) = @_;
-    my $rs = $self->application->schema->resultset( $self->rs_name );
+    my $rs = $self->app->schema->resultset( $self->rs_name );
     return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create_action {
     my ( $self ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
 
     my $form_class = $self->form_class;
     Class::MOP::load_class( $form_class );
-    my $item = $self->application->schema->resultset( $self->rs_name )->new_result( {} );
+    my $item = $self->app->schema->resultset( $self->rs_name )->new_result( {} );
     my $form = $form_class->new( 
         params => $req->parameters->as_hashref, 
-        schema => $self->application->schema,
+        schema => $self->app->schema,
         item   => $item,
     );
     if( $req->method eq 'POST' && $form->process() ){
@@ -107,12 +107,12 @@ sub view {
 
 sub delete {
     my ( $self, $record ) = @_;
-    if( $self->request->method eq 'GET' ){
+    if( $self->req->method eq 'GET' ){
         return $self->render( template => 'delete.tt', record => $record );
     }
     else{
         $record->delete;
-        my $res = $self->request->new_response();
+        my $res = $self->req->new_response();
         $res->redirect( $self->self_url );
         return $res;
     }
@@ -120,7 +120,7 @@ sub delete {
 
 sub edit {
     my ( $self, $record ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
     my $form_class = $self->form_class;
     Class::MOP::load_class( $form_class );
     my $form = $form_class->new( 

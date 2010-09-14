@@ -6,7 +6,7 @@ extends 'WebNano::Controller';
 
 sub index_action {
     my $self = shift;
-    my $res = $self->request->new_response();
+    my $res = $self->req->new_response();
     $res->redirect( '/DvdWithBaseCRUD' );
     return $res;
 }

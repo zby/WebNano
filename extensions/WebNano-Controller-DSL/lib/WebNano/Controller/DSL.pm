@@ -16,7 +16,7 @@ sub handle {
         return $action->( %args );
     }
     else{
-        my $req = $args{request};
+        my $req = $args{req};
         my $res = $req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No such page' );

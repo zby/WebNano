@@ -10,10 +10,10 @@ around 'local_dispatch' => sub {
     my( $orig, $self, $path, @args ) = @_;
     if( $path =~ s{^record/(\d+)/}{} ){
         my $id = $1;
-        my $rs = $self->application->schema->resultset( 'Dvd' );
+        my $rs = $self->app->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
         if( ! $record ) {
-            my $res = $self->request->new_response(404);
+            my $res = $self->req->new_response(404);
             $res->content_type('text/plain');
             $res->body( 'No record with id: ' . $id );
             return $res;
@@ -21,7 +21,7 @@ around 'local_dispatch' => sub {
         unshift @args, $record;
     }
     if( $path =~ m{^(view|edit|delete)/} ){
-        my $res = $self->request->new_response(404);
+        my $res = $self->req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No page found' );
         return $res;
@@ -31,17 +31,17 @@ around 'local_dispatch' => sub {
 
 sub index_action {
     my( $self ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $rs = $self->app->schema->resultset( 'Dvd' );
     return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create_action {
     my ( $self ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
 
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
         params => $req->parameters->as_hashref, 
-        schema => $self->application->schema,
+        schema => $self->app->schema,
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $record = $form->item;
@@ -61,12 +61,12 @@ sub view_action {
 
 sub delete_action {
     my ( $self, $record ) = @_;
-    if( $self->request->method eq 'GET' ){
+    if( $self->req->method eq 'GET' ){
         return $self->render( record => $record );
     }
     else{
         $record->delete;
-        my $res = $self->request->new_response();
+        my $res = $self->req->new_response();
         $res->redirect( $self->self_url );
         return $res;
     }
@@ -74,7 +74,7 @@ sub delete_action {
 
 sub edit_action {
     my ( $self, $record ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
         item   => $record,
         params => $req->parameters->as_hashref, 

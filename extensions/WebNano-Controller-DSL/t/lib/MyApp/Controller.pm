@@ -23,7 +23,7 @@ sub streaming_action {
             [ 'Content-Type' => 'text/plain', ],
         ]);
         $writer->write( "Hello, " );
-        $writer->write( $self->request->param( 'who' ) );
+        $writer->write( $self->req->param( 'who' ) );
         $writer->close();
     }
 }

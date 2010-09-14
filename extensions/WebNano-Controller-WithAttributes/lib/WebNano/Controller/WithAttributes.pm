@@ -20,7 +20,7 @@ sub local_dispatch {
         $res = $out;
     }
     else{
-        $res = $self->request->new_response(200);
+        $res = $self->req->new_response(200);
         $res->content_type('text/html');
         $res->body( $out );
     }

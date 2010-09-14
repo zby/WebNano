@@ -9,17 +9,17 @@ use DvdDatabase::Controller::Dvd::Record;
 
 sub index_action {
     my( $self ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $rs = $self->app->schema->resultset( 'Dvd' );
     return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create_action {
     my ( $self ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
 
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
         params => $req->parameters->as_hashref, 
-        schema => $self->application->schema,
+        schema => $self->app->schema,
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $record = $form->item;
@@ -33,17 +33,17 @@ sub create_action {
 
 sub record_action {
     my( $self, $id, $action ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $rs = $self->app->schema->resultset( 'Dvd' );
     my $record = $rs->find( $id );
     if( ! $record ) {
-        my $res = $self->request->new_response(404);
+        my $res = $self->req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No record with id: ' . $id );
         return $res;
     }
     return DvdDatabase::Controller::Dvd::Record->handle( 
         path => $action,
-        application => $self->application,
+        app => $self->app,
         env => $self->env,
         self_url => $self->self_url . "record/$id/",
         record => $record,

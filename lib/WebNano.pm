@@ -30,7 +30,7 @@ sub handle {
     die 'Cannot find root controller' if !$c_class;
     my $out = $c_class->handle( 
         path => $path, 
-        application => $self, 
+        app => $self, 
         env => $env, 
         self_url => '/', 
     );
@@ -129,10 +129,10 @@ the Controller class:
         my( $id, $method, @args ) = split qr{/}, $path;
         $method ||= 'view';
         if( $id && $id =~ /^\d+$/ ){
-            my $rs = $self->application->schema->resultset( 'Dvd' );
+            my $rs = $self->app->schema->resultset( 'Dvd' );
             my $record = $rs->find( $id );
             if( ! $record ) {
-                my $res = $self->request->new_response(404);
+                my $res = $self->req->new_response(404);
                 $res->content_type('text/plain');
                 $res->body( 'No record with id: ' . $id );
                 return $res;

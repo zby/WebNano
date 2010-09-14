@@ -14,24 +14,24 @@ has record_methods => (
 
 sub record_action {
     my( $self, $id, $method, @args ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $rs = $self->app->schema->resultset( 'Dvd' );
     my $record = $rs->find( $id );
     return $self->local_dispatch( $method, $record, @args );
 }
 
 sub index_action {
     my( $self ) = @_;
-    my $rs = $self->application->schema->resultset( 'Dvd' );
+    my $rs = $self->app->schema->resultset( 'Dvd' );
     return $self->render( template => 'list.tt', items => [ $rs->search ] );
 }
 
 sub create_action {
     my ( $self ) = @_;
-    my $req = $self->request;
+    my $req = $self->req;
 
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
         params => $req->parameters->as_hashref, 
-        schema => $self->application->schema,
+        schema => $self->app->schema,
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $record = $form->item;
@@ -46,7 +46,7 @@ sub create_action {
 sub view_action {
     my ( $self, $record ) = @_;
     if( !$record || !blessed($record) ) {
-        my $res = $self->request->new_response(404);
+        my $res = $self->req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No record found' );
         return $res;
@@ -58,18 +58,18 @@ sub view_action {
 sub delete_action {
     my ( $self, $record ) = @_;
     if( !$record || !blessed($record) ) {
-        my $res = $self->request->new_response(404);
+        my $res = $self->req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No record found' );
         return $res;
     }
 
-    if( $self->request->method eq 'GET' ){
+    if( $self->req->method eq 'GET' ){
         return $self->render( record => $record );
     }
     else{
         $record->delete;
-        my $res = $self->request->new_response();
+        my $res = $self->req->new_response();
         $res->redirect( $self->self_url );
         return $res;
     }
@@ -78,13 +78,13 @@ sub delete_action {
 sub edit_action {
     my ( $self, $record ) = @_;
     if( !$record || !blessed($record) ) {
-        my $res = $self->request->new_response(404);
+        my $res = $self->req->new_response(404);
         $res->content_type('text/plain');
         $res->body( 'No record found' );
         return $res;
     }
 
-    my $req = $self->request;
+    my $req = $self->req;
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
         item   => $record,
         params => $req->parameters->as_hashref, 

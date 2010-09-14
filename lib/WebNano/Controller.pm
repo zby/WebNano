@@ -9,13 +9,13 @@ use URI::Escape 'uri_unescape';
 use Plack::Request;
 use File::Spec::Functions qw/catfile catdir/;
 
-use Object::Tiny::RW  qw/ application env self_url url_map _request /;
+use Object::Tiny::RW  qw/ app env self_url url_map _req /;
 
-sub request { 
+sub req { 
     my $self = shift;
-    return $self->_request if defined $self->_request;
+    return $self->_req if defined $self->_req;
     my $req = Plack::Request->new( $self->env );
-    $self->_request( $req );
+    $self->_req( $req );
     return $req;
 }
 
@@ -23,7 +23,7 @@ sub template_search_path { [] }
 
 sub render {
     my $self = shift;
-    return $self->application->renderer->render( c => $self, @_ );
+    return $self->app->renderer->render( c => $self, @_ );
 }
 
 sub _self_path{
@@ -39,13 +39,13 @@ sub _external_dispatch {
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class = $self->find_nested( $self->_self_path . $path_part, $self->application->controller_search_path );
+    my $controller_class = $self->find_nested( $self->_self_path . $path_part, $self->app->controller_search_path );
     return if !$controller_class;
     return $controller_class->handle(
         path => $new_path,  
         self_url  => $self->self_url . $path_part . '/',
         env => $self->env,
-        application => $self->application,
+        app => $self->app,
     );
 }
 
@@ -135,7 +135,9 @@ Renders a template.
 
 Finds the method to be called for a given path and dispatches to it.
 
-=head2 request
+=head2 req 
+
+Plack::Reqest made from env
 
 =head2 template_search_path
 
@@ -145,7 +147,7 @@ Finds the method to be called for a given path and dispatches to it.
 
 A hash that is used as path part to method map.
 
-=head2 application
+=head2 app
 
 Links back to the application object.
 
