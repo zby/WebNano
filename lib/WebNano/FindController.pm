@@ -20,7 +20,7 @@ sub find_nested {
             $controller_class =~ s{/}{::}g;
         }
         catch {
-            if( $_ !~ /Can't locate $controller_file in \@INC/ ){
+            if( $_ !~ /Can't locate \Q$controller_file\E in \@INC/ ){
                 die $_;
             }
         };
