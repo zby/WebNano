@@ -128,7 +128,7 @@ the Controller class:
         my( $orig, $self, $path) = @_;
         my( $id, $method, @args ) = split qr{/}, $path;
         $method ||= 'view';
-        if( $id && $id =~ /^\d+$/ ){
+        if( $id && $id =~ /^\d+$/ && $self->is_record_method( $method ) ){
             my $rs = $self->app->schema->resultset( 'Dvd' );
             my $record = $rs->find( $id );
             if( ! $record ) {
@@ -146,6 +146,9 @@ This one checks if the first part of the path is a number - if it is it uses
 it to look for a Dvd object by primary key.  If it cannot find such a Dvd then
 it returns a 404. If it finds that dvd it then redispatches by the next path
 part and passes that dvd object as the first parameter to that method call.
+Note the need to check if the called method is an allowed one.
+If the first part of the url is not a number - then the request is dispatched in
+the normal way.
 
 The design goal numer one here is to provide basic functionality that should cover most 
 of use cases and a easy way to override it and extend. In general it is easy
@@ -169,11 +172,97 @@ that the whole object lives in that scope.  This is the same as
 Tatsumaki handlers (and controllers in Rails, Django and probably
 other frameworks) - but different from Catalyst.
 
-=head2 Streamming
+=head2 Things that you can do with WebNano even though it does not actively support them
 
-WebNano does not have any features helping with streaming content, but it also
-does not create any obstacles in using the original PSGI streamming interface.
+There is a tendency in other frameworks to add interfaces to any other CPAN
+library. With WebNano I want to keep it small, both in code and in it's
+interface, and avoid adding new WebNano interfaces to things that can be used
+directly, but instead I try to make that direct usage as simple as possible.
+
+In particular a WebNano script is a PSGI application and you can use all the Plack
+tools with it.  
+For example to use sessions you can add following line to your app.psgi file:
+
+    enable 'session'
+
+Read
+C<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session-0.12/lib/Plack/Middleware/Session.pm>
+about the additional options that you can enable here.  See also
+C<http://search.cpan.org/~miyagawa/Plack/lib/Plack/Builder.pm>
+to read about the sweetened syntax you can use in your app.psgi file
+and  C<http://search.cpan.org/search?query=Plack+Middleware&mode=all>
+to find out what other Plack::Middleware packages are available.
+
+The same goes for MVC. WebNano does not have any methods or attributes for
+models, not because I don't structure my web application using the 'web MVC'
+pattern - but rather because I don't see any universal attribute or method of
+the possible models.  Users are free to add their own methods.  For example most
+of my code uses C<DBIx::Class> - and I add these lines to my application:
+    has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
+    
+    sub _build_schema {
+       my $self = shift;
+       my $config = $self->config->{schema};
+       return DvdDatabase::DBSchema->connect( $config->{dbi_dsn},
+    $config->{user}, $config->{pass}, $config->{dbi_params} );
+    }
+and then I use it with $self->app->schema in the controller objects.
+
+As to Views - I've added some support for two templating engines for WebNano,
+but this is only because I wanted to experiment with 'template inheritance'.  If
+you don't want to use 'template inheritance' you can use Template::Tookit
+directly in your controller actions or you can use directly any templating
+engine in your controller actions - like $self->app->my_templating->process(
+'template_name' ) or even $self->my_templating->process( ... ) as long as it
+returns a string.
+
+=head3 Streamming
+
+You can use the original PSGI streamming interface
 See for example the streaming_action method in t/lib/MyApp/Controller.pm.
+
+=head3 Authentication
+
+Example code in the application class:
+
+    around handle => sub {
+        my $orig = shift;
+        my $self = shift;
+        my $env  = shift;
+        if( $env->{'psgix.session'}{user_id} ){
+            $env->{user} = $self->schema->resultset( 'User' )->find( $env->{'psgix.session'}{user_id} );
+        }
+        else{
+            my $req = Plack::Request->new( $env );
+            if( $req->param( 'username' ) && $req->param( 'password' ) ){
+                my $user = $self->schema->resultset( 'User' )->search( { username => $req->param( 'username' ) } )->first;
+                if( $user->check_password( $req->param( 'password' ) ) ){
+                    $env->{user} = $user;
+                    $env->{'psgix.session'}{user_id} = $user->id;
+                }
+            }
+        }
+        $self->$orig( $env, @_ );
+    };
+
+
+=head3 Authorization
+
+Example:
+    around 'local_dispatch' => sub {
+        my $orig = shift;
+        my $self = shift;
+        if( !$self->env->{user} ){
+            return $self->render( template => 'login_required.tt' );
+        }
+        $self->$orig( @_ );
+    };
+
+C<local_dispatch> is called before the controll is passed to child controllers,
+so if you put that into the C<MyApp::Controller::Admin> controller - then both
+all local actions and actions in child controllers (for example
+C<MyApp::Controller::Admin::User>) would be guarded agains unauthorized usage.
+
 
 =head1 ATTRIBUTES and METHODS
 
