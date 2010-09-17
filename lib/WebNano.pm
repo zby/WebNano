@@ -186,7 +186,7 @@ For example to use sessions you can add following line to your app.psgi file:
     enable 'session'
 
 Read
-C<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session-0.12/lib/Plack/Middleware/Session.pm>
+C<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
 about the additional options that you can enable here.  See also
 C<http://search.cpan.org/~miyagawa/Plack/lib/Plack/Builder.pm>
 to read about the sweetened syntax you can use in your app.psgi file
