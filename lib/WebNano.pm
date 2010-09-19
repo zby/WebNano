@@ -141,7 +141,7 @@ the Controller class:
         }
         return $self->$orig( $path );
     };
-    
+
 This one checks if the first part of the path is a number - if it is it uses
 it to look for a Dvd object by primary key.  If it cannot find such a Dvd then
 it returns a 404. If it finds that dvd it then redispatches by the next path
@@ -186,18 +186,18 @@ For example to use sessions you can add following line to your app.psgi file:
     enable 'session'
 
 Read
-C<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
+L<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
 about the additional options that you can enable here.  See also
-C<http://search.cpan.org/~miyagawa/Plack/lib/Plack/Builder.pm>
+L<http://search.cpan.org/~miyagawa/Plack/lib/Plack/Builder.pm>
 to read about the sweetened syntax you can use in your app.psgi file
-and  C<http://search.cpan.org/search?query=Plack+Middleware&mode=all>
+and  L<http://search.cpan.org/search?query=Plack+Middleware&mode=all>
 to find out what other Plack::Middleware packages are available.
 
 The same goes for MVC. WebNano does not have any methods or attributes for
 models, not because I don't structure my web application using the 'web MVC'
 pattern - but rather because I don't see any universal attribute or method of
 the possible models.  Users are free to add their own methods.  For example most
-of my code uses C<DBIx::Class> - and I add these lines to my application:
+of my code uses L<DBIx::Class> - and I add these lines to my application:
     has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
     
     sub _build_schema {
@@ -206,6 +206,7 @@ of my code uses C<DBIx::Class> - and I add these lines to my application:
        return DvdDatabase::DBSchema->connect( $config->{dbi_dsn},
     $config->{user}, $config->{pass}, $config->{dbi_params} );
     }
+
 and then I use it with $self->app->schema in the controller objects.
 
 As to Views - I've added some support for two templating engines for WebNano,
@@ -218,8 +219,8 @@ returns a string.
 
 =head3 Streamming
 
-You can use the original PSGI streamming interface
-See for example the streaming_action method in t/lib/MyApp/Controller.pm.
+You can use the original L<PSGI streamming interface|http://search.cpan.org/~miyagawa/PSGI/PSGI.pod#Delayed_Reponse_and_Streaming_Body>.
+Example - the streaming_action method in t/lib/MyApp/Controller.pm.
 
 =head3 Authentication
 
@@ -249,6 +250,7 @@ Example code in the application class:
 =head3 Authorization
 
 Example:
+
     around 'local_dispatch' => sub {
         my $orig = shift;
         my $self = shift;
