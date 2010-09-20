@@ -62,38 +62,38 @@ __END__
 
 =head1 SYNOPSIS
 
-in MyApp.pm
+A minimal WebNano application can be an
+app.psgi file like this:
 
-    package MyApp;
-    use base 'WebNano';
-    use WebNano::Renderer::TTiny;
-    
-    sub new { ... }
-
-
-in MyApp/Controller.pm
-
-    package MyApp::Controller;
-    
-    use base 'WebNano::Controller';
-    
-    sub index_action {
-        my $self = shift;
-        return 'This is my home';
+    {
+        package MyApp;
+        use base 'WebNano';
     }
-
-in app.psgi
-
-    use MyApp;
+    
+    {
+        package MyApp::Controller;
+        use base 'WebNano::Controller';
+        
+        sub index_action {
+            my $self = shift;
+            return 'This is my home';
+        }
+    }
+    
     my $app = MyApp->new();
     $app->psgi_callback;
-    
+
+
+You can then run it with C<plackup> (see L<http://search.cpan.org/dist/Plack/scripts/plackup>).
+A more practical approach is to split this into three different files.
 
 =head1 DESCRIPTION
 
-A minimalistic WebNano application consists of three parts - the application
-class, at least one controller class and the standard Plack
-L<app.psgi|http://search.cpan.org/~miyagawa/Plack/scripts/plackup> file.
+Every WebNano application has at least three parts - the application
+class, at least one controller class and the
+L<app.psgi|http://search.cpan.org/~miyagawa/Plack/scripts/plackup> file (or
+something else that uses L<http://search.cpan.org/dist/Plack/lib/Plack/Runner.pm>
+run the app).
 
 The application object is instantiated only once and is used to hold all the
 other constand data objects - like connection to the database, a template
@@ -107,13 +107,13 @@ calls as in the following examples:
     '/page' -> 'MyApp::Controller->page_action()'
     '/Some/Very/long/path' -> 'MyApp::Controller::Some::Very->long_action( 'path' )
 
-Additionally if the path ends in '/' then 'index' is added to it - so '/' is
-mapped to 'index_action' and '/SomeController/' is mapped to
-MyApp::SomeController->index_action.
+Additionally if the last part of the path is empty then C<index> is added to it - so C</> is
+mapped to C<index_action> and C</SomeController/> is mapped to
+C<MyApp::SomeController-E<gt>index_action>.
 
-If someone does not like the '_action' postfixes then he can use the
-'url_map' controller attribute which works like the 'run_modes' attribute in
-CGI::Application - that is provides a map for method dispatching:
+If someone does not like the C<_action> postfixes then he can use the
+C<url_map> controller attribute which works like the C<run_modes> attribute in
+C<CGI::Application> - that is provides a map for method dispatching:
 
     $self->url_map( { 'mapped url' => 'mapped_url' } );
 
@@ -121,7 +121,7 @@ or a list of approved methods to be dispached by name:
 
     $self->url_map( [ 'safe_method' ] );
 
-More advanced dispatching is done by overriding the 'local_dispatch' method in
+More advanced dispatching is done by overriding the C<local_dispatch> method in
 the Controller class:
 
     around 'local_dispatch' => sub {
@@ -156,7 +156,7 @@ to write your own dispatcher that work for your limited use case - and here
 you just need to do that, you can override the dispatching only for a
 particular controller and you don't need to warry about the general cases.
 
-The example in extensions/WebNano-Controller-DSL/ shows how to create a DSL
+The example in F<extensions/WebNano-Controller-DSL/> shows how to create a DSL
 for dispatching (ala Dancer):
 
     get '/some_address' => sub { 'This is some_address in web_dispatch table' };
@@ -186,9 +186,9 @@ For example to use sessions you can add following line to your app.psgi file:
     enable 'session'
 
 Read
-L<Plack::Middleware::Session|http://search.cpan.org/~miyagawa/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
+L<http://search.cpan.org/dist/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
 about the additional options that you can enable here.  See also
-L<http://search.cpan.org/~miyagawa/Plack/lib/Plack/Builder.pm>
+L<http://search.cpan.org/dist/Plack/lib/Plack/Builder.pm>
 to read about the sweetened syntax you can use in your app.psgi file
 and  L<http://search.cpan.org/search?query=Plack+Middleware&mode=all>
 to find out what other Plack::Middleware packages are available.
@@ -197,7 +197,9 @@ The same goes for MVC. WebNano does not have any methods or attributes for
 models, not because I don't structure my web application using the 'web MVC'
 pattern - but rather because I don't see any universal attribute or method of
 the possible models.  Users are free to add their own methods.  For example most
-of my code uses L<DBIx::Class> - and I add these lines to my application:
+of my code uses L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class.pm> 
+- and I add these lines to my application:
+
     has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
     
     sub _build_schema {
@@ -207,20 +209,21 @@ of my code uses L<DBIx::Class> - and I add these lines to my application:
     $config->{user}, $config->{pass}, $config->{dbi_params} );
     }
 
-and then I use it with $self->app->schema in the controller objects.
+then I use it with C<$self-E<gt>app-E<gt>schema> in the controller objects.
 
 As to Views - I've added some support for two templating engines for WebNano,
 but this is only because I wanted to experiment with 'template inheritance'.  If
 you don't want to use 'template inheritance' you can use Template::Tookit
 directly in your controller actions or you can use directly any templating
-engine in your controller actions - like $self->app->my_templating->process(
-'template_name' ) or even $self->my_templating->process( ... ) as long as it
+engine in your controller actions - like 
+C<$self-E<gt>app-E<gt>my_templating-E<gt>process('template_name' )> 
+or even C<$self-E<gt>my_templating-E<gt>process( ... )> as long as it
 returns a string.
 
 =head3 Streamming
 
-You can use the original L<PSGI streamming interface|http://search.cpan.org/~miyagawa/PSGI/PSGI.pod#Delayed_Reponse_and_Streaming_Body>.
-Example - the streaming_action method in t/lib/MyApp/Controller.pm.
+You can use the original L<http://search.cpan.org/dist/PSGI/PSGI.pod#Delayed_Reponse_and_Streaming_Body>
+The streaming_action method in F<t/lib/MyApp/Controller.pm> can be used as an example.
 
 =head3 Authentication
 

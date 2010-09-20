@@ -51,8 +51,8 @@ test_psgi(
         is( $res->code, 404 , '404 for a non controller' );
         $res = $cb->(GET "/streaming?who=zby");
         like( $res->content, qr/Hello, zby/ );
-#        $res = $cb->(GET "/DoesNotCompile/");
-#        is( $res->code, 500, '500 for controller that does not compile' );
+        $res = $cb->(GET "/DoesNotCompile/");
+        is( $res->code, 500, '500 for controller that does not compile' );
 #        in some circumstances the above code dies instead of issuing a 500
 
         $res = $cb->(GET "Deep/Nested/some");

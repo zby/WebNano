@@ -7,27 +7,23 @@ use Object::Tiny::RW;
 
 sub find_nested {
     my( $self, $sub_path, $search_path ) = @_;
-    $sub_path =~ s{::}{/};
-    my $controller_class;
+    return if $sub_path =~ /\./;
+    $sub_path =~ s{/}{::}g;
     my @path = @$search_path;
     for my $base ( @path ){
-        $base =~ s{::}{/}g;
-        my $controller_file = "$base/Controller$sub_path.pm";
-        try{
-            require $controller_file;
-            $controller_class = $controller_file;
-            $controller_class =~ s/.pm$//;
-            $controller_class =~ s{/}{::}g;
-        }
-        catch {
-            if( $_ !~ /Can't locate \Q$controller_file\E in \@INC/ ){
-                die $_;
+        my $controller_class = $base . '::Controller' . $sub_path;
+        eval "require $controller_class";
+        if( $@ ){
+            my $file = $controller_class;
+            $file =~ s{::}{/}g;
+            $file .= '.pm';
+            if( $@ !~ /Can't locate \Q$file\E in \@INC/ ){
+                die $@;
             }
         };
+        return $controller_class if $controller_class->isa( 'WebNano::Controller' );
     }
-    return if !$controller_class;
-    return if !$controller_class->isa( 'WebNano::Controller' );
-    return $controller_class;
+    return;
 }
 
 1;
