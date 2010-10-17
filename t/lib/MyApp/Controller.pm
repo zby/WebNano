@@ -3,8 +3,7 @@ use warnings;
 
 package MyApp::Controller;
 
-use base 'WebNano::Controller';
-
+use base 'WebNano::DirController';
 
 sub new {
     my $class = shift;

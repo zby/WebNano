@@ -17,5 +17,7 @@ sub some_method_action { 'This is a method with _action postfix' }
 
 sub with_template_action { shift->render( template => 'some_template' ) }
 
+sub self_url_action { shift->self_url }
+
 1;
 

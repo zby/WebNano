@@ -47,7 +47,7 @@ sub create_action {
     if( $req->method eq 'POST' && $form->process() ){
         my $record = $form->item;
         my $res = $req->new_response();
-        $res->redirect( $self->self_url . 'record/' . $record->id . '/view' );
+        $res->redirect( $self->self_url . $record->id . '/view' );
         return $res;
     }
     $form->field( 'submit' )->value( 'Create' );
@@ -82,7 +82,7 @@ sub edit {
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $res = $req->new_response();
-        $res->redirect( $self->self_url . '/' . $record->id . '/view' );
+        $res->redirect( $self->self_url . $record->id . '/view' );
         return $res;
     }
     $form->field( 'submit' )->value( 'Update' );

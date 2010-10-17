@@ -20,7 +20,7 @@ for my $controller( qw/Dvd Dvd1 Dvd2/ ){
             my $res;
             $res = $cb->(GET "/$controller");
             like( $res->content, qr/Jurassic Park II/ );
-            $res = $cb->(POST "/$controller/record/5/edit", [ name => 'Not Jurassic Park' ] );
+            $res = $cb->(POST "/$controller/record/5/edit", [ name => 'Not Jurassic Park', owner => 1 ] );
             ok( $res->is_redirect, 'Redirect after POST' );
             $res = $cb->(GET $res->header('Location'));
             like( $res->content, qr/Not Jurassic Park/ );

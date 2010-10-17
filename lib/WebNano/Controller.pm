@@ -2,12 +2,10 @@ use strict;
 use warnings;
 
 package WebNano::Controller;
-use base 'WebNano::FindController';
 
 use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
-use File::Spec::Functions qw/catfile catdir/;
 
 use Object::Tiny::RW  qw/ app env self_url url_map _req /;
 
@@ -24,29 +22,6 @@ sub template_search_path { [] }
 sub render {
     my $self = shift;
     return $self->app->renderer->render( c => $self, @_ );
-}
-
-sub _self_path{
-    my $self = shift;
-    my $path = ref $self;
-    $path =~ s/.*::Controller(?=(::|$))//;
-    $path =~ s{::}{/};
-    return $path . '/';
-}
-
-sub _external_dispatch {
-    my ( $self, $path ) = @_;
-    my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
-    $path_part =~ s/::|'//g if defined( $path_part );
-    return if !length( $path_part );
-    my $controller_class = $self->find_nested( $self->_self_path . $path_part, $self->app->controller_search_path );
-    return if !$controller_class;
-    return $controller_class->handle(
-        path => $new_path,  
-        self_url  => $self->self_url . $path_part . '/',
-        env => $self->env,
-        app => $self->app,
-    );
 }
 
 sub local_dispatch {
@@ -73,14 +48,14 @@ sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    my $out = $self->local_dispatch( $path );
-    return $out if defined $out;
-    return $self->_external_dispatch( $path );
+    return $self->local_dispatch( $path );
 };
 
 1;
 
 __END__
+
+# ABSTRACT: WebNano Controller
 
 =head1 SYNOPSIS
 With Moose:
@@ -112,17 +87,12 @@ to appropriate action method or to a next controller.
 The action method should return a string containing the HTML page, 
 a Plack::Response object or a code ref.
 
-If there is no suitable method in the current class, child controller classes
-are tried out.  If there is found one that matches the path part then it is
-instantiated with the current psgi env and it's handle method is called.
-
 =head1 METHODS
 
 =head2 handle
 
 This is a class method - it receives the arguments, creates the controller
-object and then uses it's L<local_dispatch> method, if that fails it tries to
-find a suitable child controller class and forwards the request to it.
+object and then uses it's L<local_dispatch> method.
 
 Should return a Plack::Response object, a string containing the HTML page, a code ref
 or undef (which is later interpreted as 404).

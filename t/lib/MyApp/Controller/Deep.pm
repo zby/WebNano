@@ -3,6 +3,6 @@ use warnings;
 
 package MyApp::Controller::Deep;
 
-use base 'WebNano::Controller';
+use base 'WebNano::DirController';
 
 1;

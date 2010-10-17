@@ -25,6 +25,8 @@ test_psgi(
         like( $res->content, qr/This is the safe_method page/ );
         $res = $cb->(GET "NestedController/with_template");
         like( $res->content, qr/This is a NestedController page rendered with a template/ );
+        $res = $cb->(GET "NestedController/self_url");
+        like( $res->content, qr{^/NestedController/$}, 'self_url' );
 
         $res = $cb->(GET "NestedController2/some_method");
         like( $res->content, qr/This is a method with _action postfix in MyApp::Controller::NestedController2/ );

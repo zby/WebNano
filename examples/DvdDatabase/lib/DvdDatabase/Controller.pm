@@ -3,7 +3,7 @@ use warnings;
 
 package DvdDatabase::Controller;
 
-use base 'WebNano::Controller';
+use base 'WebNano::DirController';
 
 sub index_action {
     my $self = shift;

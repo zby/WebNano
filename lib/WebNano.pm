@@ -3,13 +3,12 @@ use warnings;
 
 package WebNano;
 
-use base 'WebNano::FindController';
+use WebNano::FindController 'find_nested';
 
 our $VERSION = '0.001';
 use Plack::Response;
 use Scalar::Util qw(blessed);
 use Object::Tiny::RW 'renderer';
-use Try::Tiny;
 use Encode;
 
 sub psgi_callback {
@@ -25,7 +24,7 @@ sub controller_search_path { [ ref(shift) ] };
 sub handle {
     my( $self, $env ) = @_;
     my $path = $env->{PATH_INFO};
-    my $c_class = $self->find_nested( '', $self->controller_search_path );
+    my $c_class = find_nested( '', $self->controller_search_path );
     $path =~ s{^/}{};
     die 'Cannot find root controller' if !$c_class;
     my $out = $c_class->handle( 
@@ -106,6 +105,15 @@ calls as in the following examples:
 
     '/page' -> 'MyApp::Controller->page_action()'
     '/Some/Very/long/path' -> 'MyApp::Controller::Some::Very->long_action( 'path' )
+
+The first type of dispatching is done by the plain L<WebNano::Controller> - to get actions
+dispatched to controllers in subdirs you need to subclass L<WebNano::DirController>
+(which is also a subclass of C<WebNano::Controller>).
+So your root controllers should usually start with C<use base 'WebNano::DirController'>.
+Other controllers also can subclass C<WebNano::DirController> - but if they do 
+their own dispatching to sub-controllers then they need to subclass plain C<WebNano::Controller>,
+otherwise this automatic dispatching, sidestepping the custom-made code could become
+a security risk.
 
 Additionally if the last part of the path is empty then C<index> is added to it - so C</> is
 mapped to C<index_action> and C</SomeController/> is mapped to
@@ -294,24 +302,18 @@ follow this rule.
 =head1 DIAGNOSTICS
 
 =for author to fill in:
-    List every single error and warning message that the module can
-    generate (even the ones that will "never happen"), with a full
-    explanation of each problem, one or more likely causes, and any
-    suggested remedies.
 
 =over
 
-=item C<< Error message here, perhaps with %s placeholders >>
-
-[Description of error here]
-
-=item C<< Another error message here >>
-
-[Description of error here]
-
-[Et cetera, et cetera]
-
 =back
+
+=head1 SEE ALSO
+
+L<WebNano::Renderer::TT> - Template Toolkit renderer with template inheritance
+
+L<WebNano::Controller::CRUD> (experimental), 
+
+L<http://github.com/zby/Nblog> - example blog engine using WebNano
 
 =head1 DEPENDENCIES
 

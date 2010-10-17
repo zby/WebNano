@@ -2,11 +2,14 @@ use strict;
 use warnings;
 
 package WebNano::FindController;
+
+use Exporter 'import';
+our @EXPORT_OK = qw(find_nested); 
+
 use Try::Tiny;
-use Object::Tiny::RW;
 
 sub find_nested {
-    my( $self, $sub_path, $search_path ) = @_;
+    my( $sub_path, $search_path ) = @_;
     return if $sub_path =~ /\./;
     $sub_path =~ s{/}{::}g;
     my @path = @$search_path;
@@ -29,6 +32,8 @@ sub find_nested {
 1;
 
 __END__
+
+# ABSTRACT: Tool for finding controller classes
 
 =head2 find_nested
 

@@ -16,9 +16,9 @@
 <td>
 [% record.creation_date %]
 </td>
-<td><a href="[% self_url %]record/[% record.id %]/view">View</a></td>
-<td><a href="[% self_url %]record/[% record.id %]/edit">Edit</a></td>
-<td><a href="[% self_url %]record/[% record.id %]/delete">Delete</a></td>
+<td><a href="[% self_url %][% record.id %]/view">View</a></td>
+<td><a href="[% self_url %][% record.id %]/edit">Edit</a></td>
+<td><a href="[% self_url %][% record.id %]/delete">Delete</a></td>
 </tr>
 [% END %]
 </body>

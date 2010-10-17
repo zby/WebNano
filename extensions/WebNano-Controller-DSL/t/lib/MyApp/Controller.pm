@@ -2,7 +2,7 @@ package MyApp::Controller;
 
 use Moose;
 use MooseX::NonMoose;
-extends 'WebNano::Controller';
+extends 'WebNano::DirController';
 
 has 'url_map' => ( is => 'ro', default => sub { { 'mapped url' => 'mapped_url' } } );
 
