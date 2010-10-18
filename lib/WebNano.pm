@@ -5,7 +5,6 @@ package WebNano;
 
 use WebNano::FindController 'find_nested';
 
-our $VERSION = '0.001';
 use Plack::Response;
 use Scalar::Util qw(blessed);
 use Object::Tiny::RW 'renderer';

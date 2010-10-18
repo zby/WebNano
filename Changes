@@ -2,4 +2,6 @@ Revision history for WebNano
 
 0.001 17-10-2010 
     Initial release.
-
+0.002 17-10-2010 
+    Hiding examples from PAUSE
+{{$NEXT}}
