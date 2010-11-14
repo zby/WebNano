@@ -19,6 +19,7 @@ done_testing;
 {
     package MyApp;
     use base 'WebNano';
+    1;
 }
 
 {
@@ -29,5 +30,6 @@ done_testing;
         my $self = shift;
         return 'This is my home';
     }
+    1;
 }    
    

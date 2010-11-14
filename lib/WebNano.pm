@@ -66,6 +66,7 @@ app.psgi file like this:
     {
         package MyApp;
         use base 'WebNano';
+        1;
     }
     
     {
@@ -76,6 +77,7 @@ app.psgi file like this:
             my $self = shift;
             return 'This is my home';
         }
+        1;
     }
     
     my $app = MyApp->new();
