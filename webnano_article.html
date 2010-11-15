@@ -1,0 +1,223 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    </head>
+    <body>
+        <h1>Why WebNano</h1>
+
+There are some common parts of many web applications, things like a login page,
+a comment box, an email confirmation mechanism, a generic
+CRUD page - all of them are quite well defined and one can think that
+it should not be too
+difficult to abstract them away into libraries.  And yet, every time you start a
+web application you need to write that boring comment box again and
+again.  Why there are so few of such libraries?  Why writing them is so hard?
+There are more and less important reasons - but there are many of them and I
+guess that eventually most of such application components projects die the
+death of a thousand cuts.  Some of those problems can be solved and I believe
+that solving them would make a difference. WebNano is my attempt at doing that.
+<p>
+Please don'tread  what follows as a criticism of Catalyst - I need a point
+of reference to show how WebNano improves over existing solutions and the
+framework I know the best is Catalyst.
+
+<h2>Controllers in request scope</h2>
+
+Five years ago I was staring at the first Catalyst examples and I had this
+foggy intuition that there is something not quite optimal there.  The essence
+of object oriented programming is that the most accessed data is made available
+to all methods in a class without
+explicitly passing them via parameters.  But the examples always started with
+<code>my ( $self, $c, ... ) = @_</code>, not very DRY.  The <code>$c</code>
+parameter was dragged everywhere as if it was plain old procedural programming.
+<p> 
+At some point I <a
+    href="http://perlalchemy.blogspot.com/2009/10/catalystcomponentinstancepercontext.html">
+    counted how often methods from the manual use the controller object versus
+    how often they use the context object which contains the request data</a> -
+the result was 117 and 38 respectively.  Many people commented that their code
+often uses the controller object.  It's hard to comment on this until the code
+is made public, my own experience was very close to that show by the manual,
+but this disproportion is only an illustration.  The question is not
+about switching $c with $self. The question is why the
+request data, which undeniably is in the centre of the computation carried on
+in controllers, has to be passed around via parameters just like in plain old
+procedural code instead of being made object data freely available to all
+methods?
+<p>
+My curiosity about this was never answered in any informative way until about
+year ago I finally got a reply in private communication from some members of
+the core team - they want the controller object to be mostly immutable, and
+that of course would not be possible if one of it's attributed contained data
+changing with each new request.  Immutable objects are a good design choice and
+I accepted this answer but later I though: Wait a minute - what if we recreated
+the controller object anew with each request?  Then it could hold the request
+data and still be immutable for his whole life time.  This was the moment when
+WebNano was born.
+<p>
+I tried many Perl web frameworks but I
+found only one more that uses controllers in request scope - it is a very
+fundamental distinguishing feature of WebNano.  It's not only about reducing
+the clutter of repeatable parameter passing - I believe that putting object into
+their natural scope will fix a lot of the widely recognized <a
+    href="http://jjnapiorkowski.vox.com/library/post/does-anyone-else-hate-the-stash.html">problems
+    with the Catalyst stash and data passed through it</a>.  In procedural
+programming it is not a controversial rule to put your variable declarations
+into the narrowest block that encompasses it's usage - the same should be true
+for objects.  And if you think that creating the controller object with each
+request would be too slow - then think again: <a
+    href="http://www.cpantesters.org/cpan/report/7c61aa08-d810-11df-8503-f91d06264d1f">Object::Tiny
+    on one of the tester machines could create 714286 object per second</a> -
+and even Moose - the slowest OO framework tested there could create 13459
+objects, a few of such operations should not make much difference for web
+applications.  By the way I also tested these theoretical estimations with more
+down to earth ab benchmarks for a trivial application serving just one page -
+WebNano came out as the fastest, by a wide margin, framework tested.
+
+
+<h2>Decoupling</h2>
+
+The reason why WebNano is the fastest framework is probably that it just does
+not do much.  WebNano is really small, in it's 'lib' directory it currently has
+just 232 lines of code (as reported by sloccount) and <a
+    href="http://deps.cpantesters.org/?module=WebNano;perl=latest">minimal
+    dependencies</a>.  There are CPAN libraries covering all corners of web
+application programming - what the framework needs to do is provide a basic
+structure and get out of the way.  <p> Catalyst started the process of
+decoupling the web framework from the other parts of the application, with
+Catalyst you can use any persistence layer for the model and any templating
+library for the view.  The problem is that the <code>model</code> and
+<code>view</code> methods in Catalyst become rather empty - there is no common
+behaviour among the various libraries - so all these methods do is finding the
+model or view by it's name.  For WebNano I decided that
+<code>->Something</code> is shorter and not less informative then
+<code>->model('Something')</code> - and I got rid of these methods.
+<p>
+The other thing that I decided not to add to WebNano is initialization of
+components.  The Catalyst application builds all it's components and later
+serves as some kind of a Service Locator for them.  Because of that the
+framework needs to know how to create every component of the application and we
+have the endless list of Catalyst adapters for practically any other popular
+CPAN library.  In WebNano I decided to follow the usual advice and decouple
+these two distinct parts of the application into separate code units - or
+rather to limit WebNano to web part and let the programmer use whatever she
+wishes for the initialization part.  I've heard that <a
+    href="http://search.cpan.org/dist/Bread-Board/">Bread::Board</a> is a very
+sophisticated tool for that, for my more simple experiments <a
+    href="http://search.cpan.org/dist/MooseX-SimpleConfig/">MooseX::SimpleConfig</a>
+was very convenient.
+
+<h2>Localized dispatching</h2>
+
+Out of the box WebNano supports only very simple
+dispatching model - this can be enough because this default dispatching is
+so easy to extend and override on per controller basis.  Dispatching is about
+what subroutine is called and with what arguments - this is strongly tied to
+the subroutines themselves.  This is why I don't believe in external
+dispatchers where you configure all the dispatching for the application in one
+place.  The dispatching might be in one place - but all practical changes need
+to be done in two.
+<p>
+Writing a dispatcher is not hard - it becomes hard and
+complex when you try to write a dispatching model that would work for every
+possible application.  I prefer to write a simple dispatcher covering only the
+most popular dispatching scenarios - and let the users of my framework write
+their own specialized dispatching code for ther specialized controllers. With
+WebNano this is possible because these specialized dispatchers don't interfere
+with each other.
+<p>
+I also believe that this will make the controller classes more encapsulated
+- thus facilitating building libraries of application controllers.
+
+<h2>Granularity</h2>
+
+I like the way Catalyst structures your web related code into controller
+classes - this is a step forward from the <a
+    href="http://search.cpan.org/~markstos/CGI-Application-4.31/lib/CGI/Application.pm">CGI::Application</a>
+way of packing everything into one class.  I don't have any hard data to
+support that - but the granularity of packing a few related pages into one
+controller class feels just about right.  It gives room for expansion by adding
+new classes and dividing existing ones - and it also does not clutter the
+application code with too many nearly empty classes.  This is a very important
+feature and in WebNano I copied this.
+
+<h2>Experiments with inheritance and overriding</h2>
+
+One of the WebNano tests is an application that a subclass of the main test
+app.  It passes all the original tests and could be completely empty if I did
+not want to test the overriding of the inherited parts.  I have seen many times
+a need for such behaviour, from 'branding' websites, through SAAS to reusable
+intrenet tools - most of the time this was solved by copying the code.
+Inheritance has it's problems but it would fit well this ad-hoc reuse and it is
+still better then 'cut and paste' programming.  The key point here is that you
+need to override much more than just methods.  The experiment I am doing with
+WebNano is about overriding application parts: controllers, templates and
+configuration, and independently at the level of individual controllers once
+again overriding it's templates, plus of course the standard OO way of method
+overriding.
+
+<p>
+I think with this type of inheritance it would be more
+natural to publish applications to CPAN, because they could be operational
+without any installation.  The user could run them directly from @INC and only
+later override the configuration or templates as needed.
+
+<h2>Universality</h2> 
+In the most common case a web application serving a request needs to: fetch
+data from the database, do some computation over this data and render a
+template with the computed values.  Doing those tasks typically takes over 99%
+of the overall time spent serving a request. The 1% of time spent in the
+application framework processing does not matter much and reducing it further
+would not result in any noticeable speed increase of the whole application.
+Yet there might be some rare cases where the application needs to serve for
+example small JASON data chunks from a memory cache - even when this is a small
+and simple part of the application - if it generates enough volume - then the
+speed of the framework suddenly becomes important. Would you code that part in
+PHP?
+<p>
+It is well known that using Moose generates some significant startup overhead.
+For web applications running in persistent environments - this does not matter
+much because that overhead is amortized over many requests, but if you run your
+application as CGI - this suddenly becomes important.  I was very tempted to
+use Moose in WebNano - but even if CGI is perceived so passe now - it is still
+the easiest way to deploy web applications and also one that has the most
+widespread support from hosting companies.  Fortunately using MooseX::NonMoose
+it is very easy to treat any hash based object classes as base classes for
+Moose based code, so using WebNano does not mean that you need to stick to the
+simplistic Object Oriented Framework it uses.
+<p>
+The plan is to make WebNano small, but universal, then make extensions that
+will be more powerful and more restricted. I think it is important that the
+base platform can be used in all kinds of circumstances.
+
+<h2>Conclusions</h2>
+It is early to say if WebNano will live to the promise of facilitating the
+development of web application components.  There is a first component at CPAN:
+<a
+    href="http://search.cpan.org/dist/WebNano-Controller-CRUD/">WebNano::Controller::CRUD</a>.
+It still bears the label 'experimental' - but I used it in <a
+    href="https://github.com/zby/Nblog">Nblog</a>.  When I compare it to my
+first similar product <a
+    href="http://search.cpan.org/~wreis/Catalyst-Example-InstantCRUD-0.037/lib/Catalyst/Example/Controller/InstantCRUD.pm">Catalyst::Example::Controller::InstantCRUD</a>,
+it was simpler to write and deploy, and I think it's inheritable templates are
+especially nice - you don't need to write your own templates to see it working,
+later you can easily override the defaults.  The surprising thing when
+converting Nblog from Catalyst to WebNano was how little I missed the rich
+Catalyst features, even though WebNano has still so little code.  I think it is
+a promising start.
+
+<p>
+Recently I discovered that many of my design choices are echoed in the
+publications by the Google testing guru <a
+    href="http://misko.hevery.com/">Miško Hevery</a>.  My point of departure
+for the considerations above were general rules - like decoupling,
+encapsulation etc - his concern is testability - but the <a
+    href="http://misko.hevery.com/2008/08/21/where-have-all-the-singletons-gone/">resulting
+    design</a> is remarkably similar.  There is a lot of good articles at his
+blog, some were similar to <a
+    href="http://misko.hevery.com/2009/04/15/managing-object-lifetimes/">what I
+    already had thought over</a>, <a
+    href="http://misko.hevery.com/2009/04/08/how-to-do-everything-wrong-with-servlets/">others</a>
+were completely new to me.  I recommend them all.
+</body>
+</html>
