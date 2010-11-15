@@ -71,7 +71,8 @@ request would be too slow - then think again: <a
 and even Moose - the slowest OO framework tested there could create 13459
 objects, a few of such operations should not make much difference for web
 applications.  By the way I also tested these theoretical estimations with more
-down to earth ab benchmarks for a trivial application serving just one page -
+down to earth <a href="http://httpd.apache.org/docs/2.0/programs/ab.html">ab</a>
+benchmarks for a trivial application serving just one page -
 WebNano came out as the fastest, by a wide margin, framework tested.
 
 
@@ -101,9 +102,9 @@ have the endless list of Catalyst adapters for practically any other popular
 CPAN library.  In WebNano I decided to follow the usual advice and decouple
 these two distinct parts of the application into separate code units - or
 rather to limit WebNano to web part and let the programmer use whatever she
-wishes for the initialization part.  I've heard that <a
+wishes for the initialization part.  I was told that <a
     href="http://search.cpan.org/dist/Bread-Board/">Bread::Board</a> is a very
-sophisticated tool for that, for my more simple experiments <a
+sophisticated tool for that.  For my more simple experiments <a
     href="http://search.cpan.org/dist/MooseX-SimpleConfig/">MooseX::SimpleConfig</a>
 was very convenient.
 
@@ -159,7 +160,7 @@ overriding.
 <p>
 I think with this type of inheritance it would be more
 natural to publish applications to CPAN, because they could be operational
-without any installation.  The user could run them directly from @INC and only
+without any installation.  A user could run them directly from @INC and only
 later override the configuration or templates as needed.
 
 <h2>Universality</h2> 
