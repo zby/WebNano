@@ -17,9 +17,9 @@ guess that eventually most of such application components projects die the
 death of a thousand cuts.  Some of those problems can be solved and I believe
 that solving them would make a difference. WebNano is my attempt at doing that.
 <p>
-Please don'tread  what follows as a criticism of Catalyst - I need a point
-of reference to show how WebNano improves over existing solutions and the
-framework I know the best is Catalyst.
+Probably the most popular Perl web framework is Catalyst now, it is also the
+web framework I know the best - this is why I choose it as the point of reference
+for the analysis below. 
 
 <h2>Controllers in request scope</h2>
 
@@ -55,7 +55,7 @@ the controller object anew with each request?  Then it could hold the request
 data and still be immutable for his whole life time.  This was the moment when
 WebNano was born.
 <p>
-I tried many Perl web frameworks but I
+I have tried many Perl web frameworks but I
 found only one more that uses controllers in request scope - it is a very
 fundamental distinguishing feature of WebNano.  It's not only about reducing
 the clutter of repeatable parameter passing - I believe that putting object into
