@@ -52,8 +52,10 @@ that of course would not be possible if one of it's attributed contained data
 changing with each new request.  Immutable objects are a good design choice and
 I accepted this answer but later I though: Wait a minute - what if we recreated
 the controller object anew with each request?  Then it could hold the request
-data and still be immutable for his whole life time.  This was the moment when
-WebNano was born.
+data and still be immutable for his whole life time. Catalyst controllers 
+are created at the starup time, together with all the other application
+components (models and views) and changing that does not seem feasible - that's
+why I decided to try my chances with writing a new web framework.
 <p>
 I have tried many Perl web frameworks but I
 found only one more that uses controllers in request scope - it is a very
@@ -64,16 +66,20 @@ their natural scope will fix a lot of the widely recognized <a
     with the Catalyst stash and data passed through it</a>.  In procedural
 programming it is not a controversial rule to put your variable declarations
 into the narrowest block that encompasses it's usage - the same should be true
-for objects.  And if you think that creating the controller object with each
-request would be too slow - then think again: <a
-    href="http://www.cpantesters.org/cpan/report/7c61aa08-d810-11df-8503-f91d06264d1f">Object::Tiny
-    on one of the tester machines could create 714286 object per second</a> -
-and even Moose - the slowest OO framework tested there could create 13459
-objects, a few of such operations should not make much difference for web
-applications.  By the way I also tested these theoretical estimations with more
+for objects.  Sure using the same controller to serve multiple request is a bit
+faster then recreating it each time - but that gain is not that big -
+<a href="http://www.cpantesters.org/cpan/report/7c61aa08-d810-11df-8503-f91d06264d1f">Object::Tiny
+on one of the tester machines could create 714286 object per second</a> and even
+Moose - the slowest framework tested there can create more then a 10000 objects
+per second.  Eliminating a few of such operations, in most circumstances, is not
+worth compromising on the architecture.
+
+By the way I also tested these theoretical estimations with more
 down to earth <a href="http://httpd.apache.org/docs/2.0/programs/ab.html">ab</a>
 benchmarks for a trivial application serving just one page -
-WebNano came out as the fastest, by a wide margin, framework tested.
+WebNano came out as the fastest, by a wide margin, framework tested.  This is
+still not very realistic test - but should be enough to show
+that the cost introduced by this design choice does not need to be big.
 
 
 <h2>Decoupling</h2>
@@ -84,29 +90,28 @@ just 232 lines of code (as reported by sloccount) and <a
     href="http://deps.cpantesters.org/?module=WebNano;perl=latest">minimal
     dependencies</a>.  There are CPAN libraries covering all corners of web
 application programming - what the framework needs to do is provide a basic
-structure and get out of the way.  <p> Catalyst started the process of
-decoupling the web framework from the other parts of the application, with
-Catalyst you can use any persistence layer for the model and any templating
-library for the view.  The problem is that the <code>model</code> and
-<code>view</code> methods in Catalyst become rather empty - there is no common
-behaviour among the various libraries - so all these methods do is finding the
-model or view by it's name.  For WebNano I decided that
-<code>->Something</code> is shorter and not less informative then
+structure and get out of the way.
+<p>
+Catalyst started the process of decoupling the web framework from the other
+parts of the application, with Catalyst you can use any persistence layer for
+the model and any templating library for the view.  The problem is that the
+<code>model</code> and <code>view</code> methods in Catalyst become rather empty
+- there is no common behaviour among the various libraries - so all these
+methods do is finding the model or view by it's name.  For WebNano I decided
+that <code>->Something</code> is shorter and not less informative then
 <code>->model('Something')</code> - and I got rid of these methods.
 <p>
 The other thing that I decided not to add to WebNano is initialization of
-components.  The Catalyst application builds all it's components and later
-serves as some kind of a Service Locator for them.  Because of that the
-framework needs to know how to create every component of the application and we
-have the endless list of Catalyst adapters for practically any other popular
-CPAN library.  In WebNano I decided to follow the usual advice and decouple
-these two distinct parts of the application into separate code units - or
-rather to limit WebNano to web part and let the programmer use whatever she
-wishes for the initialization part.  I was told that <a
-    href="http://search.cpan.org/dist/Bread-Board/">Bread::Board</a> is a very
-sophisticated tool for that.  For my more simple experiments <a
+components.  Component initialization is a generic task - it can be done in a
+similar way for all kinds of programs and the library that does that job does
+not need to know anything about the web stuff.  At CPAN there are such
+libraries.  For my limited experiments <a
     href="http://search.cpan.org/dist/MooseX-SimpleConfig/">MooseX::SimpleConfig</a>
-was very convenient.
+was very convenient, for more complex needs <a
+    href="http://search.cpan.org/dist/Bread-Board/">Bread::Board</a> seems like
+a good choice.  This initialization layer needs to know how to create all the
+objects used by the application - but you don't need any kind of WebNano adapter
+for them.
 
 <h2>Localized dispatching</h2>
 
@@ -200,9 +205,15 @@ It still bears the label 'experimental' - but I used it in <a
     href="https://github.com/zby/Nblog">Nblog</a>.  When I compare it to my
 first similar product <a
     href="http://search.cpan.org/~wreis/Catalyst-Example-InstantCRUD-0.037/lib/Catalyst/Example/Controller/InstantCRUD.pm">Catalyst::Example::Controller::InstantCRUD</a>,
-it was simpler to write and deploy, and I think it's inheritable templates are
-especially nice - you don't need to write your own templates to see it working,
-later you can easily override the defaults.  The surprising thing when
+there aren't many differences. As predictable the methods have one less parameter
+(<code>$c</code>), and I think it's inheritable templates are
+nice at deployment - you don't need to write your own templates to see it working,
+later you can easily override the defaults.  There is a bit more dispatching
+code - but thanks to that the result object is being retrieved from the model in
+only one place.  In Catalyst this could also be done now by using the chained
+dispatching.
+<p>
+The surprising thing when
 converting Nblog from Catalyst to WebNano was how little I missed the rich
 Catalyst features, even though WebNano has still so little code.  I think it is
 a promising start.

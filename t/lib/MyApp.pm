@@ -7,8 +7,10 @@ use WebNano::Renderer::TTiny;
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new( @_ );
-    $self->renderer( WebNano::Renderer::TTiny->new( $self->renderer_config() ) );
+    my $self  = $class->SUPER::new( 
+        @_,
+        renderer => WebNano::Renderer::TTiny->new( $class->renderer_config() )
+    );
     return $self;
 }
 
