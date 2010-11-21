@@ -3,7 +3,6 @@ use warnings;
 
 package WebNano::Controller;
 
-use Try::Tiny;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
 
@@ -112,6 +111,11 @@ Finds the method to be called for a given path and dispatches to it.
 Plack::Reqest made from env
 
 =head2 template_search_path
+
+=head2 DEBUG
+
+By default returns the DEBUG flag from the application.  When this returns C<true> then
+some additional logging is directed to STDOUT.
 
 =head1 ATTRIBUTES
 

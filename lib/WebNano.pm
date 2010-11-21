@@ -300,6 +300,10 @@ Nearly every web application uses some templating engine - this is the
 attribute to keep the templating engine object.  It is not mandatory that you
 follow this rule.
 
+=head2 DEBUG
+
+If set prints out some debugging information to stdout.
+
 =head1 DIAGNOSTICS
 
 =for author to fill in:
