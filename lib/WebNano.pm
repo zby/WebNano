@@ -7,7 +7,7 @@ use WebNano::FindController 'find_nested';
 
 use Plack::Response;
 use Scalar::Util qw(blessed);
-use Object::Tiny::RW 'renderer';
+use Object::Tiny::RW qw( renderer DEBUG );
 use Encode;
 
 sub psgi_callback {

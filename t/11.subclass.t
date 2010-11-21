@@ -56,4 +56,17 @@ test_psgi(
      } 
 );
 
+test_psgi( 
+    app => SubClassApp->new()->psgi_callback, 
+    client => sub {
+        my $cb = shift;
+        my $res = $cb->(GET "ToBeOverridden/some");
+        is( $res->content, 'SubClassApp::Controller::ToBeOverridden', 'overridden controller' );
+        $res = $cb->(GET "ToBeOverridden/other");
+        is( $res->code, 404 , 'actions are not merged' );
+        $res = $cb->(GET "ToBeOverridden/templated");
+        is( $res->content, "t/data/templates/ToBeOverridden/templated\n", 'templates are independent' );
+     } 
+);
+
 done_testing();

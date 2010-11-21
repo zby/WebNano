@@ -9,6 +9,8 @@ use Plack::Request;
 
 use Object::Tiny::RW  qw/ app env self_url url_map _req /;
 
+sub DEBUG { shift->app->DEBUG }
+
 sub req { 
     my $self = shift;
     return $self->_req if defined $self->_req;
