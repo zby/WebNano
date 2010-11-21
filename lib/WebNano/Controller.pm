@@ -41,8 +41,12 @@ sub local_dispatch {
     }
     my $method = $name . '_action';
     $action = $self->can( $method ) if !$action;
-    return if !$action;
-    return $action->( $self, @args, @parts );
+    my $out;
+    if( $action ){
+        $out = $action->( $self, @args, @parts );
+    }
+    warn 'No local action found in "' . ref($self) . qq{" for "$name"\n} if !defined( $out ) && $self->DEBUG;
+    return $out;
 }
 
 sub handle {

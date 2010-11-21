@@ -7,8 +7,10 @@ use WebNano::FindController 'find_nested';
 
 use Plack::Response;
 use Scalar::Util qw(blessed);
-use Object::Tiny::RW qw( renderer DEBUG );
+use Object::Tiny::RW qw( renderer );
 use Encode;
+
+sub DEBUG { return defined( $ENV{PLACK_ENV} ) && $ENV{PLACK_ENV} eq 'development'; }
 
 sub psgi_callback {
     my $self = shift;
@@ -302,7 +304,8 @@ follow this rule.
 
 =head2 DEBUG
 
-If set prints out some debugging information to stdout.
+If set prints out some debugging information to stdout.  By default checks if 
+C<$ENV{PLACK_ENV} eq 'development'>.
 
 =head1 DIAGNOSTICS
 
