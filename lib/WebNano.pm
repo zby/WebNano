@@ -251,7 +251,7 @@ Example code in the application class:
             my $req = Plack::Request->new( $env );
             if( $req->param( 'username' ) && $req->param( 'password' ) ){
                 my $user = $self->schema->resultset( 'User' )->search( { username => $req->param( 'username' ) } )->first;
-                if( $user->check_password( $req->param( 'password' ) ) ){
+                if( $user && $user->check_password( $req->param( 'password' ) ) ){
                     $env->{user} = $user;
                     $env->{'psgix.session'}{user_id} = $user->id;
                 }
