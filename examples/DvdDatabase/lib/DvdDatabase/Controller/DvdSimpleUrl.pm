@@ -13,8 +13,7 @@ has record_methods => (
 );
 
 around 'local_dispatch' => sub {
-    my( $orig, $self, $path) = @_;
-    my( $id, $method, @args ) = split qr{/}, $path;
+    my( $orig, $self, $id, $method, @args ) = @_;
     $method ||= 'view';
     if( $id && $id =~ /^\d+$/ && $self->record_methods->{ $method } ){
         my $rs = $self->app->schema->resultset( 'Dvd' );
@@ -27,7 +26,7 @@ around 'local_dispatch' => sub {
         }
         return $self->$method( $record, @args );
     }
-    return $self->$orig( $path );
+    return $self->$orig( $id, $method, @args );
 };
 
 sub index_action {

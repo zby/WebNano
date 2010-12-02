@@ -17,7 +17,8 @@ sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    my $out = $self->local_dispatch( $path );
+    my @parts = split /\//, $path;
+    my $out = $self->local_dispatch( @parts );
     return $out if defined($out);
     my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
     $path_part =~ s/::|'//g if defined( $path_part );
