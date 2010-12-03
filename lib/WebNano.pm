@@ -28,8 +28,9 @@ sub handle {
     my $c_class = find_nested( '', $self->controller_search_path );
     $path =~ s{^/}{};
     die 'Cannot find root controller' if !$c_class;
+    my @parts = split /\//, $path;
     my $out = $c_class->handle( 
-        path => $path, 
+        path => [ @parts ], 
         app => $self, 
         env => $env, 
         self_url => '/', 

@@ -17,10 +17,9 @@ sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    my @parts = split /\//, $path;
-    my $out = $self->local_dispatch( @parts );
-    return $out if defined($out);
-    my( $path_part, $new_path ) = ( $path =~ qr{^([^/]*)/?(.*)} );
+    my $out = $self->local_dispatch( @$path );
+    return $out if defined( $out );
+    my $path_part = shift @$path;
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
     my $controller_class = find_nested( $class->_self_path . $path_part, $args{app}->controller_search_path );
@@ -31,7 +30,7 @@ sub handle {
     warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;
     return $controller_class->handle(
         %args,
-        path => $new_path,  
+        path => $path,
         self_url  => $args{self_url} . $path_part . '/',
     );
 }

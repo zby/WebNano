@@ -21,7 +21,6 @@ for my $controller( qw/DvdSimpleUrl/ ){
             $res = $cb->(GET "/$controller");
             like( $res->content, qr/Jurassic Park II/ );
             $res = $cb->(POST "/$controller/5/edit", [ name => 'Not Jurassic Park', owner => 1 ] );
-            warn $res->content;
             ok( $res->is_redirect, 'Redirect after POST' );
             $res = $cb->(GET $res->header('Location'));
             like( $res->content, qr/Not Jurassic Park/ );

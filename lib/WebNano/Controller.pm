@@ -52,8 +52,7 @@ sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    my @parts = split /\//, $path;
-    return $self->local_dispatch( @parts );
+    return $self->local_dispatch( @$path );
 };
 
 1;
