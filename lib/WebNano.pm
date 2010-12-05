@@ -104,11 +104,11 @@ renderer object (if it is too heavy to be created per request) and generally
 stuff that is too heavy to be rebuild with each request.  In contrast the
 controller objects are recreated for each request a new.
 
-The dispatching implemented by WebNano is simple mapping of HTTP request paths into method
-calls as in the following examples:
+The dispatching implemented by WebNano is a simple namespace matching
+of HTTP request paths into method calls as in the following examples:
 
     '/page' -> 'MyApp::Controller->page_action()'
-    '/Some/Very/long/path' -> 'MyApp::Controller::Some::Very->long_action( 'path' )
+    '/Some/Very/long/pa/th' -> 'MyApp::Controller::Some::Very->long_action( 'pa', 'th' )
 
 The first type of dispatching is done by the plain L<WebNano::Controller> - to get actions
 dispatched to controllers in subdirs you need to subclass L<WebNano::DirController>
@@ -137,8 +137,8 @@ More advanced dispatching is done by overriding the C<local_dispatch> method in
 the Controller class:
 
     around 'local_dispatch' => sub {
-        my( $orig, $self, $path) = @_;
-        my( $id, $method, @args ) = split qr{/}, $path;
+        my( $orig, $self, @path) = @_;
+        my( $id, $method, @args ) = @path;
         $method ||= 'view';
         if( $id && $id =~ /^\d+$/ && $self->is_record_method( $method ) ){
             my $rs = $self->app->schema->resultset( 'Dvd' );
@@ -151,7 +151,7 @@ the Controller class:
             }
             return $self->$method( $record, @args );
         }
-        return $self->$orig( $path );
+        return $self->$orig( @path );
     };
 
 This one checks if the first part of the path is a number - if it is it uses
