@@ -99,10 +99,10 @@ something else that uses L<http://search.cpan.org/dist/Plack/lib/Plack/Runner.pm
 run the app).
 
 The application object is instantiated only once and is used to hold all the
-other constand data objects - like connection to the database, a template
-renderer object (if it is too heavy to be created per request) and generally
-stuff that is too heavy to be rebuild with each request.  In contrast the
-controller objects are recreated for each request a new.
+other constant data objects - like the connection to the database, a template
+renderer object (if it is too heavy to be created per request) and general
+stuff that is too heavy to be rebuilt with each request.  In contrast the
+controller objects are recreated for each request.
 
 The dispatching implemented by WebNano is a simple namespace matching
 of HTTP request paths into method calls as in the following examples:
@@ -113,19 +113,18 @@ of HTTP request paths into method calls as in the following examples:
 The first type of dispatching is done by the plain L<WebNano::Controller> - to get actions
 dispatched to controllers in subdirs you need to subclass L<WebNano::DirController>
 (which is also a subclass of C<WebNano::Controller>).
-So your root controllers should usually start with C<use base 'WebNano::DirController'>.
-Other controllers also can subclass C<WebNano::DirController> - but if they do 
-their own dispatching to sub-controllers then they need to subclass plain C<WebNano::Controller>,
-otherwise this automatic dispatching, sidestepping the custom-made code could become
-a security risk.
+Your root controllers should usually start with C<use base 'WebNano::DirController'>.
+Other controllers also can subclass C<WebNano::DirController> - but only if they
+do not do their own dispatching to sub-controllers.  If a controller has custom
+dispatching then you should use C<WebNano::Controller> to avoid intruducing possible
+security risks from the automatic dispatching which could bypass your controller's logic.
 
 Additionally if the last part of the path is empty then C<index> is added to it - so C</> is
 mapped to C<index_action> and C</SomeController/> is mapped to
 C<MyApp::SomeController-E<gt>index_action>.
 
-If someone does not like the C<_action> postfixes then he can use the
-C<url_map> controller attribute which works like the C<run_modes> attribute in
-C<CGI::Application> - that is provides a map for method dispatching:
+You can override the C<_action> suffix with the C<url_map> controller attribute which
+maps URLs to functions just like the C<run_modes> attribute in C<CGI::Application>:
 
     $self->url_map( { 'mapped url' => 'mapped_url' } );
 
@@ -133,7 +132,7 @@ or a list of approved methods to be dispached by name:
 
     $self->url_map( [ 'safe_method' ] );
 
-More advanced dispatching is done by overriding the C<local_dispatch> method in
+More advanced dispatching can be done by overriding the C<local_dispatch> method in
 the Controller class:
 
     around 'local_dispatch' => sub {
@@ -154,7 +153,7 @@ the Controller class:
         return $self->$orig( @path );
     };
 
-This one checks if the first part of the path is a number - if it is it uses
+This example checks if the first part of the path is a number - if it is it uses
 it to look for a Dvd object by primary key.  If it cannot find such a Dvd then
 it returns a 404. If it finds that dvd it then redispatches by the next path
 part and passes that dvd object as the first parameter to that method call.
@@ -162,10 +161,10 @@ Note the need to check if the called method is an allowed one.
 If the first part of the url is not a number - then the request is dispatched in
 the normal way.
 
-The design goal numer one here is to provide basic functionality that should cover most 
-of use cases and a easy way to override it and extend. In general it is easy
-to write your own dispatcher that work for your limited use case - and here
-you just need to do that, you can override the dispatching only for a
+The primary design goal here is to provide basic functionality that should cover most
+use cases and offer a easy way to override and extend it for special cases.
+In general it is easy to write your own dispatcher that work for your limited use
+case - and here you just need to do that, you can override the dispatching only for a
 particular controller and you don't need to warry about the general cases.
 
 The example in F<extensions/WebNano-Controller-DSL/> shows how to create a DSL
@@ -176,23 +175,23 @@ for dispatching (ala Dancer):
 =head2 Controller object live in the request scope (new controller per request)
 
 If you need to build a heavy
-structure used in the controller you can always build it as the
+structure used in the controller you can always build it as an
 application attribute and use it in the controller as it has access to
-the application object, but since all the work of controllers is done
+the application object.  However, since all the controller's work is done
 in the request scope (i.e. creating the request) - then it makes sense
-that the whole object lives in that scope.  This is the same as
+that the whole object should live in that scope.  This is the same as
 Tatsumaki handlers (and controllers in Rails, Django and probably
-other frameworks) - but different from Catalyst.
+other frameworks), but different from Catalyst.
 
 =head2 Things that you can do with WebNano even though it does not actively support them
 
 There is a tendency in other frameworks to add interfaces to any other CPAN
-library. With WebNano I want to keep it small, both in code and in it's
-interface, and avoid adding new WebNano interfaces to things that can be used
-directly, but instead I try to make that direct usage as simple as possible.
+library. With WebNano the goal is to keep it small, both in code and in its
+interface.  Instead of adding new interfaces for things that can be used
+directly, but WebNano tries to make direct usage as simple as possible.
 
-In particular a WebNano script is a PSGI application and you can use all the Plack
-tools with it.  
+A WebNano script is a PSGI application so you can immediately use all the Plack
+tools.
 For example to use sessions you can add following line to your app.psgi file:
 
     enable 'session'
@@ -209,11 +208,11 @@ The same goes for MVC. WebNano does not have any methods or attributes for
 models, not because I don't structure my web application using the 'web MVC'
 pattern - but rather because I don't see any universal attribute or method of
 the possible models.  Users are free to add their own methods.  For example most
-of my code uses L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class.pm> 
+of my code uses L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class.pm>
 - and I add these lines to my application:
 
     has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
-    
+
     sub _build_schema {
        my $self = shift;
        my $config = $self->config->{schema};
@@ -227,12 +226,12 @@ As to Views - I've added some support for two templating engines for WebNano,
 but this is only because I wanted to experiment with 'template inheritance'.  If
 you don't want to use 'template inheritance' you can use Template::Tookit
 directly in your controller actions or you can use directly any templating
-engine in your controller actions - like 
-C<$self-E<gt>app-E<gt>my_templating-E<gt>process('template_name' )> 
+engine in your controller actions - like
+C<$self-E<gt>app-E<gt>my_templating-E<gt>process('template_name' )>
 or even C<$self-E<gt>my_templating-E<gt>process( ... )> as long as it
 returns a string.
 
-=head3 Streamming
+=head3 Streaming
 
 You can use the original L<http://search.cpan.org/dist/PSGI/PSGI.pod#Delayed_Reponse_and_Streaming_Body>
 The streaming_action method in F<t/lib/MyApp/Controller.pm> can be used as an example.
@@ -288,7 +287,7 @@ C<MyApp::Controller::Admin::User>) would be guarded agains unauthorized usage.
 This is a method which returns a subroutine reference suitable for PSGI.
 The returned subrourine ref is a closure over the application object.
 
-=head2 controller_search_path 
+=head2 controller_search_path
 
 Experimental.
 
@@ -305,7 +304,7 @@ follow this rule.
 
 =head2 DEBUG
 
-If set prints out some debugging information to stdout.  By default checks if 
+If set prints out some debugging information to stdout.  By default checks if
 C<$ENV{PLACK_ENV} eq 'development'>.
 
 =head1 DIAGNOSTICS
@@ -320,7 +319,7 @@ C<$ENV{PLACK_ENV} eq 'development'>.
 
 L<WebNano::Renderer::TT> - Template Toolkit renderer with template inheritance
 
-L<WebNano::Controller::CRUD> (experimental), 
+L<WebNano::Controller::CRUD> (experimental),
 
 L<http://github.com/zby/Nblog> - example blog engine using WebNano
 
