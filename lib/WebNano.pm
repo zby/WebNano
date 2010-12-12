@@ -180,8 +180,8 @@ application attribute and use it in the controller as it has access to
 the application object.  However, since all the controller's work is done
 in the request scope (i.e. creating the request) - then it makes sense
 that the whole object should live in that scope.  This is the same as
-Tatsumaki handlers (and controllers in Rails, Django and probably
-other frameworks), but different from Catalyst.
+Tatsumaki handlers (and probably many non-Perl
+frameworks), but different from Catalyst.
 
 =head2 Things that you can do with WebNano even though it does not actively support them
 
