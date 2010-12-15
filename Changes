@@ -6,6 +6,10 @@ Revision history for WebNano
     Hiding examples from PAUSE
 0.003     2010-11-21
     Using Class::Load
-{{$NEXT}}
+0.004     2010-11-23
     DEBUG set from env
     some improvements in debug info
+{{$NEXT}}
+    the path is split in the app class and passed around as an array
+    docs improvements from Jeff Doozan
+

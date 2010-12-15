@@ -339,5 +339,7 @@ Please report any bugs or feature requests to
 C<bug-webnano@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
+=head1 CONTRIBUTORS
 
+Jeff Doozan
 
