@@ -106,8 +106,7 @@ in MyApp::Controller:
 
 =head1 DESCRIPTION
 
-This is a wrapper around
-L<Template::Tiny|http://search.cpan.org/~adamk/Template-Tiny/lib/Template/Tiny.pm>
+This is a wrapper around L<Template::Tiny>
 - 'Template Toolkit reimplemented in as little code as possible'.
 
 The only public method here is render - it expects as input a hash with the

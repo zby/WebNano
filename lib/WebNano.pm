@@ -87,15 +87,15 @@ app.psgi file like this:
     $app->psgi_callback;
 
 
-You can then run it with C<plackup> (see L<http://search.cpan.org/dist/Plack/scripts/plackup>).
+You can then run it with L<plackup>.
 A more practical approach is to split this into three different files.
 
 =head1 DESCRIPTION
 
 Every WebNano application has at least three parts - the application
 class, at least one controller class and the
-L<app.psgi|http://search.cpan.org/~miyagawa/Plack/scripts/plackup> file (or
-something else that uses L<http://search.cpan.org/dist/Plack/lib/Plack/Runner.pm>
+L<app.psgi|plackup> file (or
+something else that uses L<Plack::Runner>
 run the app).
 
 The application object is instantiated only once and is used to hold all the
@@ -197,9 +197,9 @@ For example to use sessions you can add following line to your app.psgi file:
     enable 'session'
 
 Read
-L<http://search.cpan.org/dist/Plack-Middleware-Session/lib/Plack/Middleware/Session.pm>
+L<Plack::Middleware::Session>
 about the additional options that you can enable here.  See also
-L<http://search.cpan.org/dist/Plack/lib/Plack/Builder.pm>
+L<Plack::Builder>
 to read about the sweetened syntax you can use in your app.psgi file
 and  L<http://search.cpan.org/search?query=Plack+Middleware&mode=all>
 to find out what other Plack::Middleware packages are available.
@@ -208,7 +208,7 @@ The same goes for MVC. WebNano does not have any methods or attributes for
 models, not because I don't structure my web application using the 'web MVC'
 pattern - but rather because I don't see any universal attribute or method of
 the possible models.  Users are free to add their own methods.  For example most
-of my code uses L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class.pm>
+of my code uses L<DBIx::Class>
 - and I add these lines to my application:
 
     has schema => ( is => 'ro', isa => 'DBIx::Class::Schema', lazy_build => 1 );
@@ -233,7 +233,7 @@ returns a string.
 
 =head3 Streaming
 
-You can use the original L<http://search.cpan.org/dist/PSGI/PSGI.pod#Delayed_Reponse_and_Streaming_Body>
+You can use the original L<PSGI/Delayed_Reponse_and_Streaming_Body>
 The streaming_action method in F<t/lib/MyApp/Controller.pm> can be used as an example.
 
 =head3 Authentication
