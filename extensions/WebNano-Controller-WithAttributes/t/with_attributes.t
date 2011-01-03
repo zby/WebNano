@@ -8,7 +8,7 @@ use lib 't/lib';
 use MyApp;
 
 test_psgi( 
-    app => MyApp->new()->psgi_callback, 
+    app => MyApp->new()->psgi_app, 
     client => sub {
         my $cb = shift;
         my $res = $cb->(GET "/WithAttributes");

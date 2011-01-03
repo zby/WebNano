@@ -7,7 +7,7 @@ use Plack::Middleware::Session;
 use Test::WWW::Mechanize::PSGI;
 
 copy('t/data/dvdzbr.db','dvdzbr.db') or die "Copy failed: $!";
-my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_callback );
+my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_app );
 my $mech = Test::WWW::Mechanize::PSGI->new( app => $app );
 $mech->get_ok( '/session_check' );
 $mech->content_contains( "Hello, you've been here for 1th time!" );

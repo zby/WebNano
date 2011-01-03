@@ -12,7 +12,7 @@ use DvdDatabase;
 for my $controller( qw/Dvd Dvd1 Dvd2/ ){
     copy('t/data/dvdzbr.db','dvdzbr.db') or die "Copy failed: $!";
 
-    my $app = DvdDatabase->new()->psgi_callback;
+    my $app = DvdDatabase->new()->psgi_app;
     test_psgi( 
         app => $app,
         client => sub {

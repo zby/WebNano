@@ -12,7 +12,7 @@ use Test::WWW::Mechanize::PSGI;
 for my $controller( qw/DvdSimpleUrl/ ){
     copy('t/data/dvdzbr.db','dvdzbr.db') or die "Copy failed: $!";
 
-    my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_callback );
+    my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_app );
     test_psgi( 
         app => $app,
         client => sub {

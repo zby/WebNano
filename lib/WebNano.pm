@@ -15,6 +15,15 @@ sub DEBUG { return defined( $ENV{PLACK_ENV} ) && $ENV{PLACK_ENV} eq 'development
 sub psgi_callback {
     my $self = shift;
 
+    warn 'psgi_callback is DEPRECATED!  Use psgi_app instead';
+    sub {
+        $self->handle( shift );
+    };
+}
+
+sub psgi_app {
+    my $self = shift;
+
     sub {
         $self->handle( shift );
     };
@@ -84,7 +93,7 @@ app.psgi file like this:
     }
     
     my $app = MyApp->new();
-    $app->psgi_callback;
+    $app->psgi_app;
 
 
 You can then run it with L<plackup>.
@@ -282,7 +291,7 @@ C<MyApp::Controller::Admin::User>) would be guarded agains unauthorized usage.
 
 =head1 ATTRIBUTES and METHODS
 
-=head2 psgi_callback
+=head2 psgi_app
 
 This is a method which returns a subroutine reference suitable for PSGI.
 The returned subrourine ref is a closure over the application object.

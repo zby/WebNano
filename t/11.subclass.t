@@ -10,7 +10,7 @@ use File::Copy;
 use WebNano::Renderer::TTiny;
 
 test_psgi( 
-    app => SubClassApp->new()->psgi_callback, 
+    app => SubClassApp->new()->psgi_app, 
     client => sub {
         my $cb = shift;
         my $res = $cb->(GET "/");
@@ -57,7 +57,7 @@ test_psgi(
 );
 
 test_psgi( 
-    app => SubClassApp->new()->psgi_callback, 
+    app => SubClassApp->new()->psgi_app, 
     client => sub {
         my $cb = shift;
         my $res = $cb->(GET "ToBeOverridden/some");
