@@ -3,28 +3,26 @@ use warnings;
 
 package WebNano::DirController;
 use WebNano::FindController 'find_nested';
-use base 'WebNano::Controller';
+#use base 'WebNano::Controller';
 
 sub _self_path{
-    my $class = shift;
-    my $path = $class;
+    my $self = shift;
+    my $path = ref $self;
     $path =~ s/.*::Controller(?=(::|$))//;
     $path =~ s{::}{/};
     return $path . '/';
 }
 
-sub handle {
-    my ( $class, %args ) = @_;
+sub external_dispatch {
+    my ( $self, %args ) = @_;
     my $path = delete $args{path};
-    my $self = $class->new( %args );
-    my $out = $self->local_dispatch( @$path );
-    return $out if defined( $out );
     my $path_part = shift @$path;
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
-    my $controller_class = find_nested( $class->_self_path . $path_part, $args{app}->controller_search_path );
+    my $controller_class = find_nested( $self->_self_path . $path_part, $self->app->controller_search_path );
     if( !$controller_class ){
-        warn qq{No subcontroller found in "$class" for "} . $class->_self_path . $path_part . qq{"\n} if $self->DEBUG;
+        my $class = ref $self;
+        warn qq{No subcontroller found in "$class" for "} . $self->_self_path . $path_part . qq{"\n} if $self->DEBUG;
         return;
     }
     warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;

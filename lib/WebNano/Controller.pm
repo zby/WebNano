@@ -52,7 +52,10 @@ sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
     my $self = $class->new( %args );
-    return $self->local_dispatch( @$path );
+    my $out = $self->local_dispatch( @$path );
+    return $out if defined( $out );
+    return $self->external_dispatch( path => $path, %args ) if $self->can( 'external_dispatch' );
+    return;
 };
 
 1;
