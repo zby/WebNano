@@ -13,4 +13,6 @@ Revision history for WebNano
     the path is split in the app class and passed around as an array
     docs improvements from Jeff Doozan
 {{$NEXT}}
+    psgi_callback renamed to psgi_app (this seems to be unwritten standard)
+    docs improvements (Plack::Middleware::Auth::Form mentioned)
 

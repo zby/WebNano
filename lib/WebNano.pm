@@ -275,6 +275,10 @@ C<MyApp::Controller::Admin::User>) would be guarded agains unauthorized usage.
 This is a method which returns a subroutine reference suitable for PSGI.
 The returned subrourine ref is a closure over the application object.
 
+=head2 psgi_callback
+
+This method is deprecated - use psgi_app instead.
+
 =head2 controller_search_path
 
 Experimental.
