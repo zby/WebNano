@@ -247,28 +247,7 @@ The streaming_action method in F<t/lib/MyApp/Controller.pm> can be used as an ex
 
 =head3 Authentication
 
-Example code in the application class:
-
-    around handle => sub {
-        my $orig = shift;
-        my $self = shift;
-        my $env  = shift;
-        if( $env->{'psgix.session'}{user_id} ){
-            $env->{user} = $self->schema->resultset( 'User' )->find( $env->{'psgix.session'}{user_id} );
-        }
-        else{
-            my $req = Plack::Request->new( $env );
-            if( $req->param( 'username' ) && $req->param( 'password' ) ){
-                my $user = $self->schema->resultset( 'User' )->search( { username => $req->param( 'username' ) } )->first;
-                if( $user && $user->check_password( $req->param( 'password' ) ) ){
-                    $env->{user} = $user;
-                    $env->{'psgix.session'}{user_id} = $user->id;
-                }
-            }
-        }
-        $self->$orig( $env, @_ );
-    };
-
+https://github.com/zby/Plack-Middleware-Auth-Form soon on CPAN.
 
 =head3 Authorization
 
