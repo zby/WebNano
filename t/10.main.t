@@ -51,8 +51,7 @@ test_psgi(
         is( $res->code, 404 , '404 for non existing controller' );
         $res = $cb->(GET "/ThisIsNotController/");
         is( $res->code, 404 , '404 for a non controller' );
-        $res = $cb->(GET "/streaming?who=zby");
-        like( $res->content, qr/Hello, zby/ );
+
         $res = $cb->(GET "/DoesNotCompile/");
         is( $res->code, 500, '500 for controller that does not compile' );
 #        in some circumstances the above code dies instead of issuing a 500
@@ -61,5 +60,18 @@ test_psgi(
         is( $res->content, "This is 'some_action' in 'MyApp::Controller::Deep::Nested'" );
      } 
 );
+
+SKIP: {
+    skip '$Plack::Test::Impl ne "MockHTTP" - streaming might be not implemented', 1 if $Plack::Test::Impl ne 'MockHTTP';
+    test_psgi( 
+        app => MyApp->new()->psgi_app, 
+        client => sub {
+            my $cb = shift;
+            my $res = $cb->(GET "/streaming?who=zby");
+            like( $res->content, qr/Hello, zby/ );
+        }
+    );
+}
+
 
 done_testing();
