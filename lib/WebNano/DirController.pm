@@ -15,11 +15,10 @@ sub _self_path{
 
 sub handle {
     my ( $class, %args ) = @_;
-    my $path = delete $args{path};
     my $self = $class->new( %args );
-    my $out = $self->local_dispatch( @$path );
+    my $out = $self->local_dispatch();
     return $out if defined( $out );
-    my $path_part = shift @$path;
+    my $path_part = $self->action;
     $path_part =~ s/::|'//g if defined( $path_part );
     return if !length( $path_part );
     my $controller_class = find_nested( $class->_self_path . $path_part, $args{app}->controller_search_path );
@@ -30,7 +29,7 @@ sub handle {
     warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;
     return $controller_class->handle(
         %args,
-        path => $path,
+        path => $self->action_args,
         self_url  => $args{self_url} . $path_part . '/',
     );
 }
