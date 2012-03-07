@@ -6,28 +6,41 @@ extends 'WebNano::Controller';
 
 use DvdDatabase::Controller::Dvd::Form;
 
-has record_methods => ( 
+has url_map => ( 
     is => 'ro', 
     isa => 'HashRef', 
-    default => sub { { view => 1, 'delete' => 1, edit => 1 } }
+    default => sub { { view => 'view', 'delete' => 'delete', edit => 'edit' } }
 );
 
-around 'local_dispatch' => sub {
-    my( $orig, $self, $id, $method, @args ) = @_;
-    $method ||= 'view';
-    if( $id && $id =~ /^\d+$/ && $self->record_methods->{ $method } ){
-        my $rs = $self->app->schema->resultset( 'Dvd' );
-        my $record = $rs->find( $id );
-        if( ! $record ) {
-            my $res = $self->req->new_response(404);
-            $res->content_type('text/plain');
-            $res->body( 'No record with id: ' . $id );
-            return $res;
-        }
-        return $self->$method( $record, @args );
+has record => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_record',
+);
+sub _build_record {
+    my $self = shift;
+    my $id = $self->path->[0];
+    if( $id =~ /^\d+$/ ){
+        return $self->app->schema->resultset( 'Dvd' )->find( $id );
     }
-    return $self->$orig( $id, $method, @args );
-};
+    return;
+}
+
+sub action_name { 
+    my $self = shift;
+    my @path = @{ $self->path };
+    warn "@path";
+    if( defined( $path[0] ) and $path[0] =~ /^\d+$/ ){
+        if( defined $self->record ){
+            warn $self->record;
+            return $path[1];
+        }
+        else{
+            return 'no_record';
+        }
+    }
+    return $path[0];
+}
 
 sub index_action {
     my( $self ) = @_;
@@ -54,18 +67,18 @@ sub create_action {
 }
 
 sub view {
-    my ( $self, $record ) = @_;
+    my ( $self, ) = @_;
 
-    return $self->render( record => $record );
+    return $self->render( record => $self->record );
 }
 
 sub delete {
-    my ( $self, $record ) = @_;
+    my ( $self, ) = @_;
     if( $self->req->method eq 'GET' ){
-        return $self->render( record => $record );
+        return $self->render( record => $self->record );
     }
     else{
-        $record->delete;
+        $self->record->delete;
         my $res = $self->req->new_response();
         $res->redirect( $self->self_url );
         return $res;
@@ -73,15 +86,15 @@ sub delete {
 }
 
 sub edit {
-    my ( $self, $record ) = @_;
+    my ( $self, ) = @_;
     my $req = $self->req;
     my $form = DvdDatabase::Controller::Dvd::Form->new( 
-        item   => $record,
+        item   => $self->record,
         params => $req->parameters->as_hashref, 
     );
     if( $req->method eq 'POST' && $form->process() ){
         my $res = $req->new_response();
-        $res->redirect( $self->self_url . $record->id . '/view' );
+        $res->redirect( $self->self_url . $self->record->id . '/view' );
         return $res;
     }
     $form->field( 'submit' )->value( 'Update' );

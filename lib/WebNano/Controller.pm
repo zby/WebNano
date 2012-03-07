@@ -6,7 +6,7 @@ package WebNano::Controller;
 use URI::Escape 'uri_unescape';
 use Plack::Request;
 
-use Object::Tiny::RW  qw/ app env self_url url_map _req /;
+use Object::Tiny::RW  qw/ app env self_url url_map _req path/;
 
 sub DEBUG { shift->app->DEBUG }
 
@@ -25,11 +25,20 @@ sub render {
     return $self->app->renderer->render( c => $self, @_ );
 }
 
+sub action_name { shift->path->[0] }
+
+sub action_args {
+    my $self = shift;
+    my @path = @{ $self->path };
+    return @path[ 1 .. $#path ];
+}
+
 sub local_dispatch {
-    my ( $self, @parts ) = @_;
-    my $name = uri_unescape( shift @parts );
-    $name = 'index' if !defined( $name ) || !length( $name );
+    my ( $self ) = @_;
     my $action;
+    my $name = uri_unescape( $self->action_name );
+    $name = 'index' if !defined( $name ) || !length( $name );
+    warn "dispatching for $name";
     if( my $map = $self->url_map ){
         if( ref $map eq 'HASH' ){
             $action = $self->can( $map->{$name} ) if $map->{$name};
@@ -38,11 +47,12 @@ sub local_dispatch {
             $action = $self->can( $name ) if grep { $_ eq $name } @$map;
         }
     }
-    my $method = $name . '_action';
-    $action = $self->can( $method ) if !$action;
+    if( !$action ){
+        $action = $self->can( $name . '_action' ) if defined $name;
+    }
     my $out;
     if( $action ){
-        $out = $action->( $self, @parts );
+        $out = $action->( $self, $self->action_args );
     }
     warn 'No local action found in "' . ref($self) . qq{" for "$name"\n} if !defined( $out ) && $self->DEBUG;
     return $out;
@@ -50,9 +60,8 @@ sub local_dispatch {
 
 sub handle {
     my ( $class, %args ) = @_;
-    my $path = delete $args{path};
     my $self = $class->new( %args );
-    return $self->local_dispatch( @$path );
+    return $self->local_dispatch( @{ $self->path } );
 };
 
 1;
