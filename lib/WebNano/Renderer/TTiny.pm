@@ -22,23 +22,21 @@ sub _to_list {
 sub render {
     my( $self, %vars ) = @_;
     my $c = $vars{c};
-
     my @search_path;
+    my $action;
     if( $c ){
         my $path = ref $c;
         $path =~ s/.*::Controller(::)?//;
         $path =~ s{::}{/};
         @search_path = ( $path, @{ $c->template_search_path });
+        $action = $c->action_name;
     }
     if( !@search_path ){
         @search_path = ( '' );
     }
     my $template = $vars{template};
     if( !$template ){
-        my @caller = caller(2);
-        $template =  $caller[3];
-        $template =~ s/_action$//;
-        $template =~ s/^.*:://;
+        $template = $action;
         $template .= '.' . $self->TEMPLATE_EXTENSION if $self->TEMPLATE_EXTENSION;
     }
     my $full_template;

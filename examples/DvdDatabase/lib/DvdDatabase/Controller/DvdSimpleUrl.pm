@@ -6,12 +6,6 @@ extends 'WebNano::Controller';
 
 use DvdDatabase::Controller::Dvd::Form;
 
-has url_map => ( 
-    is => 'ro', 
-    isa => 'HashRef', 
-    default => sub { { view => 'view', 'delete' => 'delete', edit => 'edit' } }
-);
-
 has record => (
     is => 'ro',
     lazy => 1,
@@ -26,20 +20,32 @@ sub _build_record {
     return;
 }
 
+sub record_path {
+    my $self = shift;
+    return defined( $self->path->[0] ) and $self->path->[0] =~ /^\d+$/;
+}
+
+sub action_postfix {
+    my $self = shift;
+    if( $self->record_path ){
+        return '_record';
+    }
+    else{
+        return '_action';
+    }
+}
+
 sub action_name { 
     my $self = shift;
-    my @path = @{ $self->path };
-    warn "@path";
-    if( defined( $path[0] ) and $path[0] =~ /^\d+$/ ){
+    if( $self->record_path ){
         if( defined $self->record ){
-            warn $self->record;
-            return $path[1];
+            return $self->path->[1];
         }
         else{
-            return 'no_record';
+            return 'no';
         }
     }
-    return $path[0];
+    return $self->path->[0] || 'index';
 }
 
 sub index_action {
@@ -66,13 +72,12 @@ sub create_action {
     return $self->render( template => 'edit.tt', form => $form->render );
 }
 
-sub view {
+sub view_record {
     my ( $self, ) = @_;
-
     return $self->render( record => $self->record );
 }
 
-sub delete {
+sub delete_record {
     my ( $self, ) = @_;
     if( $self->req->method eq 'GET' ){
         return $self->render( record => $self->record );
@@ -85,7 +90,7 @@ sub delete {
     }
 }
 
-sub edit {
+sub edit_record {
     my ( $self, ) = @_;
     my $req = $self->req;
     my $form = DvdDatabase::Controller::Dvd::Form->new( 

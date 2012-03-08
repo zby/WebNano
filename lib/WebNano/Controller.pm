@@ -25,7 +25,7 @@ sub render {
     return $self->app->renderer->render( c => $self, @_ );
 }
 
-sub action_name { shift->path->[0] }
+sub action_name { shift->path->[0] // 'index' }
 
 sub action_args {
     my $self = shift;
@@ -33,12 +33,12 @@ sub action_args {
     return @path[ 1 .. $#path ];
 }
 
+sub action_postfix { '_action' };
+
 sub local_dispatch {
     my ( $self ) = @_;
     my $action;
     my $name = uri_unescape( $self->action_name );
-    $name = 'index' if !defined( $name ) || !length( $name );
-    warn "dispatching for $name";
     if( my $map = $self->url_map ){
         if( ref $map eq 'HASH' ){
             $action = $self->can( $map->{$name} ) if $map->{$name};
@@ -48,7 +48,7 @@ sub local_dispatch {
         }
     }
     if( !$action ){
-        $action = $self->can( $name . '_action' ) if defined $name;
+        $action = $self->can( $name . $self->action_postfix ) if defined $name;
     }
     my $out;
     if( $action ){
