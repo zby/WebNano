@@ -9,7 +9,7 @@ use File::Copy;
 use Plack::Middleware::Session;
 use Test::WWW::Mechanize::PSGI;
 
-for my $controller( qw/DvdSimpleUrl/ ){
+for my $controller( qw/DvdSimpleUrl DvdSimpleUrl_TwoClasses/ ){
     copy('t/data/dvdzbr.db','dvdzbr.db') or die "Copy failed: $!";
 
     my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_app );
