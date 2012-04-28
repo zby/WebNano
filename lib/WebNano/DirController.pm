@@ -13,6 +13,24 @@ sub _self_path{
     return $path . '/';
 }
 
+sub dispatch_to_class {
+    my ( $self, $to, $args ) = @_;
+    $to =~ s/::|'//g if defined( $to );
+    return if !length( $to );
+    my $class = ref $self;
+    my $controller_class = find_nested( $class->_self_path . $to, $args->{app}->controller_search_path );
+    if( !$controller_class ){
+        warn qq{No subcontroller found in "$class" for "} . $class->_self_path . $to. qq{"\n} if $self->DEBUG;
+        return;
+    }
+    warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;
+    return $controller_class->handle(
+        %{ $args },
+        path => $path,
+        self_url  => $args{self_url} . $to. '/',
+    );
+}
+
 sub handle {
     my ( $class, %args ) = @_;
     my $path = delete $args{path};
@@ -20,19 +38,7 @@ sub handle {
     my $out = $self->local_dispatch( @$path );
     return $out if defined( $out );
     my $path_part = shift @$path;
-    $path_part =~ s/::|'//g if defined( $path_part );
-    return if !length( $path_part );
-    my $controller_class = find_nested( $class->_self_path . $path_part, $args{app}->controller_search_path );
-    if( !$controller_class ){
-        warn qq{No subcontroller found in "$class" for "} . $class->_self_path . $path_part . qq{"\n} if $self->DEBUG;
-        return;
-    }
-    warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;
-    return $controller_class->handle(
-        %args,
-        path => $path,
-        self_url  => $args{self_url} . $path_part . '/',
-    );
+    return $self->dispatch_to_class( $path_part, \%args );
 }
 
 
