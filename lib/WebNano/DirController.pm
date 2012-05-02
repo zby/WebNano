@@ -26,14 +26,13 @@ sub dispatch_to_class {
     warn qq{Dispatching to "$controller_class"\n} if $self->DEBUG;
     return $controller_class->handle(
         %{ $args },
-        path => $path,
-        self_url  => $args{self_url} . $to. '/',
+        self_url  => $args->{self_url} . $to. '/',
     );
 }
 
 sub handle {
     my ( $class, %args ) = @_;
-    my $path = delete $args{path};
+    my $path = $args{path};
     my $self = $class->new( %args );
     my $out = $self->local_dispatch( @$path );
     return $out if defined( $out );
