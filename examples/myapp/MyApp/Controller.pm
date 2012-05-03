@@ -3,7 +3,7 @@ use warnings;
 
 package MyApp::Controller;
 
-use base 'WebNano::DirController';
+use base 'WebNano::Controller';
 
 
 sub index_action {

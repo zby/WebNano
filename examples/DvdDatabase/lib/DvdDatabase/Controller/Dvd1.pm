@@ -16,7 +16,9 @@ sub record_action {
     my( $self, $id, $method, @args ) = @_;
     my $rs = $self->app->schema->resultset( 'Dvd' );
     my $record = $rs->find( $id );
-    return $self->local_dispatch( $method, $record, @args );
+    my @path = @{ $self->path };
+    $self->path( [ $method, $record, @path[ 2 .. $#path ] ] );
+    return $self->local_dispatch();
 }
 
 sub index_action {

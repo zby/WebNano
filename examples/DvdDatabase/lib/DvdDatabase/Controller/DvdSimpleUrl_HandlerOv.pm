@@ -12,7 +12,7 @@ use DvdDatabase::Controller::Dvd::Record;
 
 sub handle {
     my ( $class, %args ) = @_;
-    my @path = @{ delete $args{path} };
+    my @path = @{ $args{path} };
     my $id = $path[0];
     if( $id && $id =~ /^\d+$/ ){
         my $rs = $args{app}->schema->resultset( 'Dvd' );
@@ -31,7 +31,7 @@ sub handle {
         );
     }
     my $self = $class->new( %args );
-    return $self->local_dispatch( @path );
+    return $self->local_dispatch();
 };
 
 sub index_action {

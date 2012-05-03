@@ -7,7 +7,8 @@ extends 'WebNano::Controller';
 use DvdDatabase::Controller::Dvd::Form;
 
 around 'local_dispatch' => sub {
-    my( $orig, $self, $path, $id, $method, @args ) = @_;
+    my( $orig, $self, ) = @_;
+    my( $path, $id, $method, @args ) = @{ $self->path };
     if( defined $path && $path eq 'record' ){
         my $rs = $self->app->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
@@ -17,8 +18,8 @@ around 'local_dispatch' => sub {
             $res->body( 'No record with id: ' . $id );
             return $res;
         }
-        unshift @args, $record;
-        return $self->$orig( $method, @args );
+        $self->path( [ $method, $record, @args ] );
+        return $self->$orig();
     }
     if( defined $path && $path =~ m{^(view|edit|delete)} ){
         my $res = $self->req->new_response(404);
@@ -26,7 +27,7 @@ around 'local_dispatch' => sub {
         $res->body( 'No page found' );
         return $res;
     }
-    return $self->$orig( $path, $id, $method, @args );
+    return $self->$orig();
 };
 
 sub index_action {
@@ -89,4 +90,3 @@ sub edit_action {
 }
 
 1;
-

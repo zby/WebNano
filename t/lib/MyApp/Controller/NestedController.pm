@@ -19,5 +19,12 @@ sub with_template_action { shift->render( template => 'some_template' ) }
 
 sub self_url_action { shift->self_url }
 
+sub env_check_action { 
+    my $self = shift;
+    my $env = $self->env;
+    return 'env present' if $env;
+    return 'no env'
+}
+
 1;
 

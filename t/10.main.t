@@ -27,6 +27,8 @@ test_psgi(
         like( $res->content, qr/This is a NestedController page rendered with a template/ );
         $res = $cb->(GET "NestedController/self_url");
         like( $res->content, qr{^/NestedController/$}, 'self_url' );
+        $res = $cb->(GET "NestedController/env_check");
+        like( $res->content, qr{^env present$}, 'env_check' );
 
         $res = $cb->(GET "NestedController2/some_method");
         like( $res->content, qr/This is a method with _action postfix in MyApp::Controller::NestedController2/ );

@@ -113,20 +113,21 @@ renderer object (if it is too heavy to be created per request) and general
 stuff that is too heavy to be rebuilt with each request.  In contrast the
 controller objects are recreated for each request.
 
-The dispatching implemented by WebNano is a simple namespace matching
+The dispatching implemented by L<WebNano::Controller> is a simple namespace matching
 of HTTP request paths into method calls as in the following examples:
 
     '/page' -> 'MyApp::Controller->page_action()'
     '/Some/Very/long/pa/th' -> 'MyApp::Controller::Some::Very->long_action( 'pa', 'th' )
 
-The first type of dispatching is done by the plain L<WebNano::Controller> - to get actions
-dispatched to controllers in subdirs you need to subclass L<WebNano::DirController>
-(which is also a subclass of C<WebNano::Controller>).
-Your root controllers should usually start with C<use base 'WebNano::DirController'>.
-Other controllers also can subclass C<WebNano::DirController> - but only if they
+The first type of dispatching is always available - to get actions
+dispatched to controllers in subdirs you need to override the C<search_subcontrollers>
+method and make it return a true value.
+Your root controllers should usually have C<sub search_subcontrollers { 1 }>.
+Other controllers also can do that - but only if they
 do not do their own dispatching to sub-controllers.  If a controller has custom
-dispatching then you should use C<WebNano::Controller> to avoid intruducing possible
-security risks from the automatic dispatching which could bypass your controller's logic.
+dispatching then you should leave the default C<search_subcontrollers> to avoid 
+intruducing possible security risks from the automatic dispatching which could 
+bypass your controller's logic.
 
 Additionally if the last part of the path is empty then C<index> is added to it - so C</> is
 mapped to C<index_action> and C</SomeController/> is mapped to

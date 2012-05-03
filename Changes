@@ -18,3 +18,7 @@ Revision history for WebNano
     docs improvements (Plack::Middleware::Auth::Form mentioned)
 
 {{$NEXT}}
+    got rid of DirController (add sub search_subcontrollers { 1 } to get the functionality
+        with standard Controller
+    path attribute for the Controller class - removing all the path parameter passing
+    dispatch_to_class factored out

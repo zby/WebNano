@@ -12,7 +12,8 @@ use DvdDatabase::Controller::Dvd::Record;
 
 
 around 'local_dispatch' => sub {
-    my( $orig, $self, $id, @args ) = @_;
+    my( $orig, $self ) = @_;
+    my( $id, @args ) = @{ $self->path };
     if( $id && $id =~ /^\d+$/ ){
         my $rs = $self->app->schema->resultset( 'Dvd' );
         my $record = $rs->find( $id );
@@ -30,7 +31,7 @@ around 'local_dispatch' => sub {
             record => $record,
         );
     }
-    return $self->$orig( $id, @args );
+    return $self->$orig();
 };
 
 

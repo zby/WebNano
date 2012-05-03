@@ -10,6 +10,7 @@ use Plack::Middleware::Session;
 use Test::WWW::Mechanize::PSGI;
 
 for my $controller( qw/DvdSimpleUrl_HandlerOv DvdSimpleUrl DvdSimpleUrl_TwoClasses/ ){
+    warn "Testing $controller\n";
     copy('t/data/dvdzbr.db','dvdzbr.db') or die "Copy failed: $!";
 
     my $app = Plack::Middleware::Session->wrap( DvdDatabase->new()->psgi_app );

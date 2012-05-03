@@ -1,4 +1,2 @@
-Change controller attribute self_uri to self_path.
-
 Make debug messages appear in Plack stacktrace page.
 
