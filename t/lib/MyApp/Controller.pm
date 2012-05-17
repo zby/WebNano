@@ -36,5 +36,7 @@ sub streaming_action {
     }
 }
 
+sub postonly_POST { 'This is a method with _POST postfix' }
+
 1;
 

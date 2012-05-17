@@ -40,8 +40,11 @@ sub local_dispatch {
             $action = $self->can( $name ) if grep { $_ eq $name } @$map;
         }
     }
-    my $method = $name . '_action';
-    $action = $self->can( $method ) if !$action;
+    $action = $self->can( $name . '_action' ) if !$action;
+    if( ! $action ){
+        my $method = uc( $self->env->{REQUEST_METHOD} );
+        $action = $self->can( $name . '_' . $method ) if $method eq 'GET' || $method eq 'POST';
+    }
     my $out;
     if( $action ){
         $out = $action->( $self, @parts );

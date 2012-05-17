@@ -19,6 +19,11 @@ test_psgi(
         $res = $cb->(GET "/mapped url");
         like( $res->content, qr/This is the mapped url page/ );
 
+        $res = $cb->(GET "/postonly");
+        is( $res->code, 404 , 'GET for a POST controller' );
+        $res = $cb->(POST "/postonly");
+        like( $res->content, qr/This is a method with _POST postfix/ );
+
         $res = $cb->(GET "NestedController/some_method");
         like( $res->content, qr/This is a method with _action postfix/ );
         $res = $cb->(GET "NestedController/safe_method");
