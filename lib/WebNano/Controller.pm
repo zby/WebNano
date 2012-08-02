@@ -5,6 +5,7 @@ package WebNano::Controller;
 
 use URI::Escape 'uri_unescape';
 use Plack::Request;
+use Encode;
 
 use WebNano::FindController 'find_nested';
 use Object::Tiny::RW  qw/ app env self_url url_map _req path /;
@@ -15,6 +16,8 @@ sub req {
     my $self = shift;
     return $self->_req if defined $self->_req;
     my $req = Plack::Request->new( $self->env );
+    _decode_parameters($req->query_parameters);
+    _decode_parameters($req->body_parameters);
     $self->_req( $req );
     return $req;
 }
@@ -91,6 +94,15 @@ sub handle {
 }
 
 sub search_subcontrollers { 0 }
+
+sub _decode_parameters {
+    my ($multihash) = @_;
+    for my $key (keys %$multihash) {
+        my @vals = $multihash->get_all($key);
+        $multihash->remove($key);
+        $multihash->set(decode_utf8($key), map decode_utf8($_), @vals);
+    }
+}
 
 1;
 
